@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f7a5a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meu Plano">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>Meu Plano</title>
+<style>
+:root{
+  --bg:#f3f5f4; --card:#ffffff; --ink:#1b2226; --soft:#5d6870; --line:#dde3e0;
+  --accent:#1f7a5a; --accent-ink:#ffffff; --accent-bg:#e5f2eb;
+  --warn:#9a6212; --warn-bg:#fcf1dc; --over:#b4400d; --over-bg:#fce8de;
+  --danger:#b3261e; --danger-bg:#fbeceb; --chip:#eef1f0; --shadow:0 1px 2px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#111615; --card:#1b2220; --ink:#eef2f0; --soft:#a3aeaa; --line:#2c3532;
+    --accent:#3fb489; --accent-ink:#0c1512; --accent-bg:#17342a;
+    --warn:#e2b25a; --warn-bg:#3a2e17; --over:#f0875a; --over-bg:#3b2219;
+    --danger:#f08a82; --danger-bg:#3b1d1b; --chip:#232b29; --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:18px;line-height:1.35;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 16px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:560px;margin:0 auto}
+header.top h1{font-size:22px;margin:0;letter-spacing:-.2px}
+.help-btn{background:var(--danger-bg);color:var(--danger);font-weight:700;font-size:15px;border-radius:999px;padding:9px 14px;min-height:44px}
+.icon-btn{min-width:44px;min-height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:22px}
+.card{background:var(--card);border-radius:16px;padding:14px 16px;margin:10px 0;box-shadow:var(--shadow)}
+.card h2{font-size:17px;margin:0 0 6px;color:var(--soft);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.muted{color:var(--soft)}
+.small{font-size:15px}
+.tiny{font-size:13px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.daynav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 2px}
+.daynav .title{text-align:center}
+.daynav .title b{display:block;font-size:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:10px 18px;border-radius:14px;font-weight:600;background:var(--chip)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.block{width:100%}
+.btn.warn{background:var(--warn-bg);color:var(--warn)}
+.btn.danger{background:var(--danger-bg);color:var(--danger)}
+.check{display:flex;align-items:center;gap:12px;min-height:48px;width:100%;text-align:left}
+.box{width:30px;height:30px;border-radius:9px;border:2.5px solid var(--soft);display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:18px;font-weight:800}
+.check.on .box{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.bar{height:14px;background:var(--chip);border-radius:999px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar.over i{background:var(--over)}
+.bar.low i{background:var(--warn)}
+.barlabel{display:flex;justify-content:space-between;font-size:15px;margin:10px 0 4px}
+.meal{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;min-height:72px}
+.meal .emo{font-size:30px;width:40px;text-align:center;flex:none}
+.meal .nm{font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.chip.vazio{background:var(--chip);color:var(--soft)}
+.chip.ok{background:var(--accent-bg);color:var(--accent)}
+.chip.falta{background:var(--warn-bg);color:var(--warn)}
+.chip.passou{background:var(--over-bg);color:var(--over)}
+.chip.trocado{background:var(--chip);color:var(--soft)}
+.note{font-size:14px;color:var(--soft);margin-top:2px}
+.note.warn{color:var(--warn)}
+.banner{border-radius:16px;padding:14px 16px;margin:10px 0;font-size:16px}
+.banner.info{background:var(--accent-bg)}
+.banner.warn{background:var(--warn-bg);color:var(--warn)}
+.banner.over{background:var(--over-bg);color:var(--over)}
+.oakbtn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;min-height:60px}
+.oakbtn .emo{font-size:30px}
+.plate{min-height:64px;border:2px dashed var(--line);border-radius:14px;padding:6px}
+.plate.drag{border-color:var(--accent);background:var(--accent-bg)}
+.item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .emo{font-size:26px;width:34px;text-align:center}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:44px;height:44px;border-radius:12px;background:var(--chip);font-size:24px;font-weight:700}
+.qty b{min-width:34px;text-align:center;font-size:19px}
+.sugs{display:grid;gap:10px}
+.sug{border:2px solid var(--accent);border-radius:14px;padding:12px 14px;background:var(--card)}
+.sug .emos{font-size:24px;letter-spacing:2px}
+.sug .why{font-size:14px;color:var(--accent);font-weight:700;margin:4px 0 8px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:none;min-height:40px;padding:8px 14px;border-radius:999px;background:var(--chip);font-size:15px;font-weight:600}
+.cats button.on{background:var(--ink);color:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.food{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 10px 12px;text-align:left;min-height:112px;display:flex;flex-direction:column;gap:2px;position:relative;user-select:none;-webkit-user-select:none}
+.food:active{transform:scale(.98)}
+.food .emo{font-size:32px;line-height:1.1}
+.food .fn{font-weight:700;font-size:16px}
+.food .fp{font-size:13px;color:var(--soft)}
+.food .tag{position:absolute;top:8px;right:8px;font-size:11px;font-weight:800;background:var(--accent-bg);color:var(--accent);border-radius:999px;padding:2px 7px}
+.food .cnt{position:absolute;top:8px;right:8px;background:var(--accent);color:var(--accent-ink);border-radius:999px;min-width:24px;height:24px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px}
+.presets{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
+.presets button{flex:none;min-height:44px;padding:8px 14px;border-radius:12px;background:var(--accent-bg);color:var(--accent);font-weight:700;font-size:15px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:600;color:var(--soft)}
+nav.tabs button span{font-size:24px}
+nav.tabs button.on{color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.field label{font-size:15px;color:var(--soft);font-weight:600}
+.field input{min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:10px 14px;font-size:20px}
+.list .li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.list .li:last-child{border-bottom:0}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat .s{background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+.stat .s b{display:block;font-size:26px}
+.why-list .w{padding:12px 0;border-bottom:1px solid var(--line)}
+.why-list .w:last-child{border-bottom:0}
+.why-list .w b{display:block}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheet h3{margin:0 0 10px;font-size:21px}
+.sheet .acts{display:grid;gap:10px;margin-top:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:15;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;font-size:16px;width:min(92vw,520px);box-shadow:0 4px 18px rgba(0,0,0,.2)}
+.toast span{flex:1}
+.toast button{color:var(--accent-bg);font-weight:800;min-height:40px;padding:0 8px;text-decoration:underline}
+.back{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--accent);min-height:44px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+svg text{font-family:inherit}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+/* ==========================================================
+   MEU PLANO — app do plano de treino + alimentação
+   Valores: TACO, rótulos comuns e tabela oficial da Oakberry.
+   Dados ficam só neste aparelho (armazenamento do navegador).
+   ========================================================== */
+
+const VERSION = 1;
+const STORE_KEY = "meuPlano.v1";
+
+/* ---------- catálogo de cards ---------- */
+const GROUPS = {prot:"Proteínas", lat:"Laticínios", pao:"Pães e cereais", fruta:"Frutas e legumes", doce:"Doces", beb:"Bebidas", extra:"Extras", oak:"Oakberry"};
+const CATALOG = [
+  {id:"ovo", nome:"Ovo", e:"🥚", g:"prot", porcao:"1 unidade", k:73, p:6.7, maxQ:3},
+  {id:"frango", nome:"Frango grelhado", e:"🍗", g:"prot", porcao:"1 filé do tamanho da palma", k:159, p:32, maxQ:1},
+  {id:"frango_emp", nome:"Frango empanado na airfryer", e:"🍗", g:"prot", porcao:"3–4 tiras", k:225, p:30, maxQ:1},
+  {id:"frango_desf", nome:"Frango desfiado", e:"🍗", g:"prot", porcao:"1 colher de sopa cheia", k:27, p:5.3, maxQ:5},
+  {id:"hamb", nome:"Hambúrguer caseiro", e:"🥩", g:"prot", porcao:"1 unidade (120 g cru)", k:160, p:26, maxQ:1},
+  {id:"carne", nome:"Carne moída ao molho", e:"🥩", g:"prot", porcao:"4 colheres de sopa cheias", k:235, p:35, maxQ:1},
+  {id:"strog", nome:"Strogonoff de frango", e:"🍲", g:"prot", porcao:"1 concha cheia", k:190, p:23, maxQ:1},
+  {id:"peru", nome:"Peito de peru", e:"🦃", g:"prot", porcao:"1 fatia", k:16, p:2.7, maxQ:3},
+  {id:"leite", nome:"Leite desnatado", e:"🥛", g:"lat", porcao:"1 copo (250 ml)", k:88, p:8.5},
+  {id:"iogurte", nome:"Iogurte natural", e:"🥣", g:"lat", porcao:"1 pote", k:70, p:6.5},
+  {id:"minas", nome:"Queijo minas", e:"🧀", g:"lat", porcao:"1 fatia", k:79, p:5.2},
+  {id:"muss", nome:"Mussarela", e:"🧀", g:"lat", porcao:"1 fatia", k:66, p:4.5},
+  {id:"req", nome:"Requeijão light", e:"🫙", g:"lat", porcao:"1 colher de sopa", k:27, p:1.5},
+  {id:"whey", nome:"Whey", e:"💪", g:"lat", porcao:"1 dose (30 g)", k:120, p:22, maxQ:1},
+  {id:"paofr", nome:"Pão francês", e:"🥖", g:"pao", porcao:"1 unidade", k:150, p:4, step:0.5, pao:true, maxQ:1},
+  {id:"paoint", nome:"Pão de forma integral", e:"🍞", g:"pao", porcao:"1 fatia", k:63, p:2.4, pao:true},
+  {id:"paohamb", nome:"Pão de hambúrguer", e:"🍔", g:"pao", porcao:"1 unidade", k:140, p:4.5, pao:true, maxQ:1},
+  {id:"arroz", nome:"Arroz", e:"🍚", g:"pao", porcao:"1 colher de sopa cheia", k:32, p:0.6, maxQ:4},
+  {id:"feijao", nome:"Feijão", e:"🫘", g:"pao", porcao:"1 concha média", k:61, p:3.8, maxQ:1},
+  {id:"macarrao", nome:"Macarrão", e:"🍝", g:"pao", porcao:"1 pegador", k:150, p:5, maxQ:1},
+  {id:"aveia", nome:"Aveia", e:"🌾", g:"pao", porcao:"1 colher de sopa", k:39, p:1.4},
+  {id:"rap10", nome:"Rap10", e:"🌯", g:"pao", porcao:"1 unidade", k:120, p:3.5, pao:true, maxQ:1},
+  {id:"tapioca", nome:"Goma de tapioca", e:"🫓", g:"pao", porcao:"2 colheres de sopa", k:100, p:0, pao:true, maxQ:1},
+  {id:"banana", nome:"Banana", e:"🍌", g:"fruta", porcao:"1 unidade média", k:98, p:1.3, maxQ:1},
+  {id:"maca", nome:"Maçã", e:"🍎", g:"fruta", porcao:"1 unidade", k:73, p:0.4, maxQ:1},
+  {id:"mamao", nome:"Mamão", e:"🥭", g:"fruta", porcao:"1 fatia", k:68, p:1, maxQ:1},
+  {id:"morango", nome:"Morango", e:"🍓", g:"fruta", porcao:"8 unidades", k:36, p:1, maxQ:1},
+  {id:"legumes", nome:"Legumes", e:"🥦", g:"fruta", porcao:"1 pires cheio", k:30, p:1.2},
+  {id:"azeite", nome:"Azeite", e:"🫒", g:"extra", porcao:"1 colher de chá", k:44, p:0, maxQ:1},
+  {id:"molho", nome:"Molho de tomate", e:"🍅", g:"fruta", porcao:"3 colheres de sopa", k:15, p:0.6, maxQ:1},
+  {id:"pacoca", nome:"Paçoca", e:"🥜", g:"doce", porcao:"1 unidade (20 g)", k:106, p:2.9},
+  {id:"bombom", nome:"Bombom", e:"🍫", g:"doce", porcao:"1 unidade", k:110, p:1},
+  {id:"brigadeiro", nome:"Brigadeiro pequeno", e:"🍬", g:"doce", porcao:"1 unidade", k:80, p:1},
+  {id:"goiabada", nome:"Goiabada", e:"🟥", g:"doce", porcao:"1 fatia fina (30 g)", k:86, p:0},
+  {id:"doceleite", nome:"Doce de leite", e:"🍮", g:"doce", porcao:"1 colher de sopa", k:61, p:1.5},
+  {id:"chocolate", nome:"Chocolate ao leite", e:"🍫", g:"doce", porcao:"20 g", k:108, p:1.5},
+  {id:"suco", nome:"Suco", e:"🧃", g:"beb", porcao:"1 copo pequeno (200 ml)", k:80, p:1, suco:true, maxQ:1},
+  {id:"achoc", nome:"Achocolatado zero", e:"🍫", g:"beb", porcao:"1 colher de sopa, no leite", k:35, p:1.5, maxQ:1},
+  {id:"refri", nome:"Refrigerante zero", e:"🥤", g:"beb", porcao:"1 lata", k:0, p:0},
+  {id:"oak500", nome:"Açaí Oakberry 500 ml", e:"🍇", g:"oak", porcao:"1 copo, sem acompanhamento", k:516, p:0, oak:true, maxQ:1},
+  {id:"oakwhey", nome:"Whey no açaí", e:"💪", g:"oak", porcao:"28 g", k:112, p:20, maxQ:1},
+  {id:"oakmorango", nome:"Morango no açaí", e:"🍓", g:"oak", porcao:"1 porção", k:12, p:0, maxQ:1},
+  {id:"oakbanana", nome:"Banana no açaí", e:"🍌", g:"oak", porcao:"1 porção", k:59, p:0.8, maxQ:1}
+];
+const FOOD = Object.fromEntries(CATALOG.map(f => [f.id, f]));
+
+/* ---------- refeições e metas (plano de 15 dias) ---------- */
+const MEALS = [
+  {id:"cafe", nome:"Café da manhã", e:"☀️", hora:"7h–8h", kMin:350, kMax:450, pMin:25,
+   pref:["leite","ovo","paofr","muss","minas","paoint","peru","iogurte","aveia","banana","morango","achoc","whey","maca","mamao","req"],
+   presets:[
+     {nome:"Vitamina", itens:[["leite",1],["whey",1],["banana",1],["aveia",2]]},
+     {nome:"Ovos com pão", itens:[["ovo",3],["muss",1],["paofr",1]]},
+     {nome:"Misto quente + leite", itens:[["paoint",2],["muss",2],["peru",2],["leite",1]]}
+   ]},
+  {id:"almoco", nome:"Almoço", e:"🍽️", hora:"12h–13h", kMin:450, kMax:550, pMin:30,
+   pref:["arroz","feijao","legumes","frango","frango_emp","hamb","carne","strog","macarrao","molho","azeite"],
+   presets:[{nome:"Prato base (arroz, feijão, legumes)", itens:[["arroz",4],["feijao",1],["legumes",1],["azeite",1]]}]},
+  {id:"doce", nome:"Docinho", e:"🍬", hora:"depois do almoço", kMin:0, kMax:110, pMin:0,
+   pref:["pacoca","bombom","brigadeiro","goiabada","doceleite","chocolate","mamao","banana","morango"], presets:[]},
+  {id:"lanche", nome:"Lanche", e:"🥪", hora:"16h–17h", kMin:250, kMax:350, pMin:15,
+   pref:["paoint","frango_desf","req","leite","achoc","paofr","minas","iogurte","maca","banana","muss","peru"],
+   presets:[
+     {nome:"Sanduíche de frango", itens:[["paoint",2],["frango_desf",3],["req",1],["maca",1]]},
+     {nome:"Leite com achocolatado e pão", itens:[["leite",1],["achoc",1],["paofr",1],["minas",1]]},
+     {nome:"Iogurte com fruta", itens:[["iogurte",1],["maca",1],["minas",2]]}
+   ]},
+  {id:"jantar", nome:"Jantar", e:"🌙", hora:"19h30–20h30", kMin:350, kMax:470, pMin:25,
+   pref:["ovo","muss","paofr","legumes","frango_desf","rap10","molho","hamb","paohamb","tapioca","minas","frango"],
+   presets:[
+     {nome:"Omelete com pão", itens:[["ovo",3],["muss",1],["paofr",1],["legumes",1]]},
+     {nome:"Pizza de rap10", itens:[["rap10",1],["molho",1],["frango_desf",5],["muss",1.5]]},
+     {nome:"Hambúrguer no pão", itens:[["hamb",1],["paohamb",1],["muss",1],["legumes",1]]},
+     {nome:"Crepioca", itens:[["ovo",1],["tapioca",1],["frango_desf",4],["muss",1]]}
+   ]}
+];
+const MEAL = Object.fromEntries(MEALS.map(m => [m.id, m]));
+const OAK_PRESET = {nome:"Oakberry do plano (açaí + whey + morango)", itens:[["oak500",1],["oakwhey",1],["oakmorango",1]]};
+const DAY_KMIN = 1700, DAY_KMAX = 1800, DAY_PMIN = 100, DAY_PMAX = 130, DAY_FLOOR = 1500;
+const EGGS_WEEK = 12, OAK_WEEK = 2;
+
+/* ---------- datas (sempre no fuso do aparelho) ---------- */
+const pad = n => String(n).padStart(2, "0");
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dateOf = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d, 12); };
+const todayKey = () => keyOf(new Date());
+const addDays = (k, n) => { const d = dateOf(k); d.setDate(d.getDate() + n); return keyOf(d); };
+const diffDays = (a, b) => Math.round((dateOf(b) - dateOf(a)) / 864e5);
+const weekday = k => dateOf(k).getDay(); // 0 = domingo
+const weekStart = k => addDays(k, -((weekday(k) + 6) % 7)); // segunda-feira
+const DOW = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const MON = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const fmtDay = k => { const d = dateOf(k); return `${DOW[d.getDay()]}, ${d.getDate()} de ${MON[d.getMonth()]}`; };
+const fmtShort = k => { const d = dateOf(k); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`; };
+const n0 = x => Math.round(x).toLocaleString("pt-BR");
+const n1 = x => (Math.round(x * 10) / 10).toLocaleString("pt-BR");
+const qtyTxt = q => (q === 0.5 ? "½" : q % 1 ? n1(q) : String(q));
+
+/* ---------- armazenamento (só neste aparelho) ---------- */
+let memoryOnly = false;
+function blank() { return {version: VERSION, start: todayKey(), days: {}, weights: []}; }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return blank();
+    const d = JSON.parse(raw);
+    if (!d || d.version !== VERSION || typeof d.days !== "object") return blank();
+    d.weights = Array.isArray(d.weights) ? d.weights : [];
+    return d;
+  } catch (e) { memoryOnly = true; return blank(); }
+}
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); memoryOnly = false; }
+  catch (e) { memoryOnly = true; }
+}
+let data = load();
+save();
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+/* ---------- estado da tela ---------- */
+const ui = {view: "hoje", day: todayKey(), meal: null, cat: "comuns", modal: null, toast: null, bannerOff: false};
+let undoSnap = null, toastTimer = null, lastWhere = "";
+
+function dayObj(k, create) {
+  if (!data.days[k] && create) data.days[k] = {type: "normal", meals: {}, treino: false, cam1: false, cam2: false};
+  return data.days[k] || {type: "normal", meals: {}, treino: false, cam1: false, cam2: false};
+}
+const items = (k, m) => (dayObj(k).meals[m] || []).filter(i => FOOD[i.id]);
+
+/* ---------- contas ---------- */
+function totalsOf(list) {
+  let k = 0, p = 0;
+  for (const it of list) { const f = FOOD[it.id]; if (!f) continue; k += f.k * it.q; p += f.p * it.q; }
+  return {k, p};
+}
+function baseTarget(k, m) {
+  const d = dayObj(k), b = MEAL[m];
+  let t = {kMin: b.kMin, kMax: b.kMax, pMin: b.pMin, adj: 0, adjFrom: null, pBoost: false};
+  if (d.type === "oak") {
+    if (m === "lanche") t = {...t, kMin: 520, kMax: 680, pMin: 15};
+    if (m === "doce") t = {...t, kMin: 0, kMax: 0, pMin: 0};
+    if (m === "jantar") t = {...t, kMin: 280, kMax: 360, pMin: 25};
+  }
+  return t;
+}
+function targets(k) {
+  const T = {};
+  for (const m of MEALS) T[m.id] = baseTarget(k, m.id);
+  // excesso das refeições já lançadas sai das que faltam (docinho, jantar, lanche)
+  let over = 0, from = null;
+  for (const m of MEALS) {
+    const list = items(k, m.id);
+    if (!list.length) continue;
+    const t = totalsOf(list), x = t.k - T[m.id].kMax;
+    if (x > 15) { over += x; from = from || m.nome; }
+  }
+  const floors = {doce: 0, jantar: 250, lanche: 150, almoco: 350, cafe: 250};
+  for (const mid of ["doce", "jantar", "lanche", "almoco", "cafe"]) {
+    if (over <= 0) break;
+    if (items(k, mid).length) continue;
+    const t = T[mid], cap = Math.max(0, t.kMax - floors[mid]);
+    const cut = Math.min(cap, over);
+    if (cut > 0) { t.kMax -= cut; t.kMin = Math.max(0, Math.min(t.kMin, t.kMax - 80)); t.adj = cut; t.adjFrom = from; over -= cut; }
+  }
+  // proteína do dia: se faltar, o jantar pede mais
+  if (!items(k, "jantar").length) {
+    let proj = 0;
+    for (const m of MEALS) {
+      if (m.id === "jantar") continue;
+      const list = items(k, m.id);
+      proj += list.length ? totalsOf(list).p : T[m.id].pMin;
+    }
+    const need = Math.min(45, DAY_PMIN - proj);
+    if (need > T.jantar.pMin) { T.jantar.pMin = Math.ceil(need); T.jantar.pBoost = true; }
+  }
+  return T;
+}
+function status(k, m, T) {
+  const list = items(k, m), d = dayObj(k), t = (T || targets(k))[m];
+  if (d.type === "oak" && m === "doce" && !list.length) return {s: "trocado", txt: "trocado pelo açaí"};
+  if (!list.length) return {s: "vazio", txt: "Ainda não lançou"};
+  const tot = totalsOf(list);
+  if (m === "doce") return tot.k <= t.kMax + 5 ? {s: "ok", txt: "ok"} : {s: "passou", txt: `passou ${n0(tot.k - t.kMax)} kcal`};
+  if (d.type === "oak" && m === "lanche" && list.some(i => i.id === "oak500") && tot.p < t.pMin) return {s: "falta", txt: "sem proteína: peça whey"};
+  if (tot.k > t.kMax + 15) return {s: "passou", txt: `passou ${n0(tot.k - t.kMax)} kcal`};
+  if (tot.p < t.pMin - 0.5) return {s: "falta", txt: "falta proteína"};
+  if (tot.k < t.kMin - 60) return {s: "falta", txt: "falta um pouco"};
+  return {s: "ok", txt: "ok"};
+}
+function dayTotals(k) {
+  let kk = 0, pp = 0;
+  for (const m of MEALS) { const t = totalsOf(items(k, m.id)); kk += t.k; pp += t.p; }
+  return {k: kk, p: pp};
+}
+function weekDays(k) { const s = weekStart(k); return [0,1,2,3,4,5,6].map(i => addDays(s, i)); }
+function eggsInWeek(k, excludeMeal) {
+  let n = 0;
+  for (const dk of weekDays(k)) {
+    const d = data.days[dk]; if (!d) continue;
+    for (const [mid, list] of Object.entries(d.meals)) {
+      if (dk === k && mid === excludeMeal) continue;
+      for (const it of list) if (it.id === "ovo") n += it.q;
+    }
+  }
+  return n;
+}
+function oakInWeek(k) { return weekDays(k).filter(dk => data.days[dk] && data.days[dk].type === "oak").length; }
+function sucoToday(k) { let n = 0; for (const list of Object.values(dayObj(k).meals)) for (const it of list) if (it.id === "suco") n += it.q; return n; }
+
+/* ---------- motor de sugestões ---------- */
+function suggestions(k, m) {
+  const list = items(k, m), d = dayObj(k), T = targets(k), t = T[m], tot = totalsOf(list);
+  if (d.type === "oak" && m === "lanche") {
+    if (!list.some(i => i.id === "oak500")) return {msg: "Hoje o lanche é o Oakberry. Toque para lançar o do plano.", opts: [{itens: OAK_PRESET.itens, why: "açaí 500 ml + whey + morango: ~640 kcal e 20 g de proteína"}]};
+    if (!list.some(i => i.id === "oakwhey")) return {msg: "O açaí sozinho não tem proteína.", opts: [{itens: [["oakwhey", 1]], why: "whey no açaí: +20 g de proteína"}]};
+    return {msg: null, opts: []};
+  }
+  if (m === "doce") {
+    if (d.type === "oak") return {msg: null, opts: []};
+    if (list.length) return {msg: null, opts: []};
+    return {msg: "Um docinho de até ~110 kcal, no lugar da fruta.", opts: [["pacoca"],["bombom"],["doceleite"]].map(([id]) => ({itens: [[id, 1]], why: `${FOOD[id].porcao}: ~${FOOD[id].k} kcal`}))};
+  }
+  if (!list.length) {
+    const base = MEAL[m].presets;
+    let combos;
+    if (m === "almoco") combos = [["frango", "frango grelhado"], ["hamb", "hambúrguer caseiro"], ["carne", "carne moída ao molho"]].map(([id]) => base[0].itens.concat([[id, 1]]));
+    else combos = base.slice(0, 3).map(p => p.itens);
+    const tt = it => totalsOf(it.map(([id, q]) => ({id, q})));
+    combos = combos.map(it => (tt(it).k > t.kMax + 15 ? it.filter(([id]) => !FOOD[id].pao) : it));
+    return {msg: t.adj > 0 || (d.type === "oak" && m === "jantar") ? "Hoje a meta está menor. Estas opções já cabem nela." : "Comece por um prato pronto ou monte com os cards abaixo.",
+      opts: combos.map(it => { const x = tt(it); return {itens: it, why: `~${n0(x.k)} kcal e ${n0(x.p)} g de proteína`}; })};
+  }
+  const pNeed = t.pMin - tot.p, kNeed = t.kMin - tot.k, room = t.kMax - tot.k;
+  if (room < -15) return {msg: null, opts: []};
+  if (pNeed <= 0.5 && kNeed <= 60) return {msg: null, opts: []};
+  const weekEggs = eggsInWeek(k, m) + list.filter(i => i.id === "ovo").reduce((a, i) => a + i.q, 0);
+  const cand = MEAL[m].pref.filter(id => {
+    const f = FOOD[id]; if (!f || f.g === "doce" || f.g === "oak" || f.g === "extra") return false;
+    if (id === "ovo" && weekEggs >= EGGS_WEEK) return false;
+    if (id === "suco") return false;
+    if (id === "whey" && list.some(i => i.id === "whey")) return false;
+    if (id === "macarrao" && list.some(i => i.id === "arroz")) return false;
+    if (id === "arroz" && list.some(i => i.id === "macarrao")) return false;
+    const inPlate = list.find(i => i.id === id);
+    if (inPlate && f.maxQ && inPlate.q >= f.maxQ) return false;
+    return true;
+  });
+  const mid = (t.kMin + t.kMax) / 2, opts = [];
+  const rank = id => MEAL[m].pref.indexOf(id);
+  const push = (itens, bonus) => {
+    let ak = 0, ap = 0;
+    for (const [id, q] of itens) { ak += FOOD[id].k * q; ap += FOOD[id].p * q; }
+    if (itens.some(([id, q]) => id === "ovo" && weekEggs + q > EGGS_WEEK)) return;
+    const nk = tot.k + ak, np = tot.p + ap;
+    const valid = nk <= t.kMax + 15 && (pNeed <= 0.5 || np >= t.pMin) && nk >= t.kMin - 100;
+    let score = Math.abs(nk - mid) / 40 + (itens.length - 1) * 1.2 + itens.reduce((a, [id]) => a + rank(id), 0) / itens.length * 0.12;
+    if (pNeed <= 0.5 && itens.every(([id]) => FOOD[id].g === "fruta")) score -= 0.8;
+    if (itens.some(([id]) => FOOD[id].g === "fruta" && id !== "molho")) score -= 0.6;
+    score += itens.reduce((a, [id, q]) => a + ((FOOD[id].maxQ || 2) >= 4 ? 0 : Math.max(0, q - 1) * 1.0), 0);
+    if (bonus) score -= bonus;
+    opts.push({itens, ak, ap, nk, np, valid, score});
+  };
+  for (const pr of MEAL[m].presets) {
+    if (!pr.itens.some(([id]) => list.some(i => i.id === id))) continue;
+    const rest = pr.itens.map(([id, q]) => { const inP = list.find(i => i.id === id); return [id, Math.round((q - (inP ? inP.q : 0)) * 10) / 10]; }).filter(([, q]) => q > 0);
+    if (rest.length && rest.length <= 3) push(rest, 1.4);
+  }
+  for (const id of cand) {
+    const f = FOOD[id], inP = list.find(i => i.id === id), maxQ = (f.maxQ || 2) - (inP && f.maxQ ? inP.q : 0);
+    for (let q = 1; q <= maxQ; q++) push([[id, q]]);
+    if (f.step === 0.5) push([[id, 0.5]]);
+  }
+  const top = cand.slice(0, 12);
+  for (let i = 0; i < top.length; i++) for (let j = i + 1; j < top.length; j++) {
+    if (FOOD[top[i]].g === FOOD[top[j]].g) continue;
+    push([[top[i], 1], [top[j], 1]]);
+  }
+  let good = opts.filter(o => o.valid).sort((a, b) => a.score - b.score);
+  let fallback = false;
+  if (!good.length) {
+    fallback = true;
+    good = opts.filter(o => o.nk <= t.kMax + 15).sort((a, b) => (b.np - a.np) || (a.score - b.score));
+  }
+  const picked = [];
+  const keyIds = o => o.itens.map(([id]) => id).filter(id => FOOD[id].g !== "fruta");
+  for (const o of good) {
+    const ks = keyIds(o);
+    if (picked.some(pk => keyIds(pk).some(id => ks.includes(id)) || (ks.length === 0 && keyIds(pk).length === 0))) continue;
+    picked.push(o);
+    if (picked.length === 3) break;
+  }
+  const faltaP = Math.max(0, Math.ceil(pNeed)), faltaK = Math.max(0, Math.round(kNeed / 10) * 10);
+  let msg;
+  if (faltaP > 0 && faltaK > 60) msg = `Falta pelo menos ${faltaP} g de proteína e ~${faltaK} kcal.`;
+  else if (faltaP > 0) msg = `Falta pelo menos ${faltaP} g de proteína.`;
+  else msg = `Falta ~${faltaK} kcal para fechar a refeição.`;
+  if (fallback) msg += " Estas opções chegam o mais perto possível.";
+  return {msg, opts: picked.map(o => ({itens: o.itens, why: pNeed > 0.5 ? `+${n0(o.ap)} g de proteína, +${n0(o.ak)} kcal` : `+${n0(o.ak)} kcal`}))};
+}
+const itensTxt = itens => itens.map(([id, q]) => (q === 1 ? FOOD[id].nome : `${FOOD[id].nome} × ${qtyTxt(q)}`)).join(" + ");
+
+/* ---------- plano de treino (15 dias) ---------- */
+function training(k) {
+  const idx = diffDays(data.start, k), wd = weekday(k);
+  if (idx < 0) return {txt: "O plano ainda não começou", det: `Começa em ${fmtShort(data.start)}.`, rest: true, idx};
+  const w1 = idx < 7;
+  const map = {
+    1: `Musculação A + ${w1 ? 15 : 20} min de cardio`,
+    2: `Cardio ${w1 ? 45 : 60} min`,
+    3: "Beach tennis",
+    4: `Musculação B + ${w1 ? 15 : 20} min de cardio`,
+    5: `Cardio ${w1 ? 45 : 60} min`
+  };
+  const txt = map[wd] || "Descanso";
+  const rest = !map[wd];
+  let det = rest ? "Aproveite. A caminhada depois das refeições continua valendo." :
+    (wd === 3 ? "Conta como cardio. Beba água nas pausas." : "Cardio no ritmo de conversa: fala frases, mas não canta (107–127 batimentos).");
+  if (idx === 14) det = "Dia 15: pesar, medir a cintura e revisar o plano com o personal. " + det;
+  return {txt, det, rest, idx};
+}
+
+/* ---------- ações ---------- */
+function snapshot(k) { undoSnap = {k, day: JSON.parse(JSON.stringify(dayObj(k)))}; }
+function toast(msg, undo) {
+  ui.toast = {msg, undo}; clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { ui.toast = null; render(); }, 5000);
+}
+function addItems(k, m, itens, label) {
+  snapshot(k);
+  const d = dayObj(k, true), list = d.meals[m] = d.meals[m] || [];
+  const warnings = [];
+  for (const [id, q] of itens) {
+    const f = FOOD[id];
+    if (id === "ovo" && eggsInWeek(k) + q > EGGS_WEEK) warnings.push(`Ovos da semana passam de ${EGGS_WEEK}.`);
+    if (f.suco && sucoToday(k) + q > 1) warnings.push("Suco: o combinado é 1 copo pequeno por dia.");
+    const it = list.find(i => i.id === id);
+    if (it) it.q = Math.round((it.q + q) * 10) / 10; else list.push({id, q});
+  }
+  save();
+  toast(`Adicionado: ${label || itensTxt(itens)}` + (warnings.length ? ` · ${warnings[0]}` : ""), true);
+}
+function changeQty(k, m, id, dir) {
+  snapshot(k);
+  const d = dayObj(k, true), list = d.meals[m] || [], it = list.find(i => i.id === id);
+  if (!it) return;
+  const step = FOOD[id].step || 1;
+  it.q = Math.round((it.q + dir * step) * 10) / 10;
+  if (it.q <= 0) d.meals[m] = list.filter(i => i.id !== id);
+  save();
+}
+function setOak(k, on, force) {
+  const d = dayObj(k, true);
+  if (on && !force) {
+    const n = oakInWeek(k);
+    const prev = data.days[addDays(k, -1)], next = data.days[addDays(k, 1)];
+    const seguido = (prev && prev.type === "oak") || (next && next.type === "oak");
+    if (n >= OAK_WEEK || seguido) {
+      ui.modal = {
+        title: n >= OAK_WEEK ? "Já foram 2 açaís nesta semana" : "Açaí em dias seguidos",
+        body: n >= OAK_WEEK
+          ? "<p>O combinado é até 2 por semana. O limite não é a caloria, é o açúcar: com 2 açaís e o docinho diário, o açúcar fica abaixo do limite da OMS. Um 3º passa do limite.</p><p>Se for mesmo, prefira o de 350 ml e continue com as trocas.</p>"
+          : "<p>O combinado é não repetir em dias seguidos, para espalhar o açúcar pela semana.</p>",
+        actions: [{label: "Deixar para outro dia", a: "modal-close", primary: true}, {label: "Lançar mesmo assim", a: "oak-force"}]
+      };
+      return;
+    }
+  }
+  snapshot(k);
+  d.type = on ? "oak" : "normal";
+  if (on && !(d.meals.lanche || []).some(i => i.id === "oak500")) d.meals.lanche = OAK_PRESET.itens.map(([id, q]) => ({id, q}));
+  if (!on && d.meals.lanche) d.meals.lanche = d.meals.lanche.filter(i => FOOD[i.id].g !== "oak");
+  save();
+  toast(on ? "Dia de Oakberry: saem o lanche e o docinho, e o jantar fica sem pão." : "Voltou para dia normal.", true);
+}
+
+/* ---------- desenho das telas ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function bar(val, min, max, cls) {
+  const pct = Math.max(0, Math.min(100, val / max * 100));
+  return `<div class="bar ${cls || ""}"><i style="width:${pct}%"></i></div>`;
+}
+function greet() { const h = new Date().getHours(); return h < 12 ? "Bom dia!" : h < 18 ? "Boa tarde!" : "Boa noite!"; }
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function isStandalone() { return navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches); }
+
+function viewHoje() {
+  const k = ui.day, d = dayObj(k), tr = training(k), T = targets(k), tot = dayTotals(k);
+  const isToday = k === todayKey();
+  const lastW = data.weights.slice().sort((a, b) => a.date < b.date ? 1 : -1)[0];
+  const needWeigh = isToday && (!lastW || diffDays(lastW.date, k) >= 7);
+  const oakN = oakInWeek(k);
+  const planDay = tr.idx >= 0 && tr.idx < 15 ? `Dia ${tr.idx + 1} de 15` : tr.idx >= 15 ? `Semana ${Math.floor(tr.idx / 7) + 1} do plano` : "";
+  let h = "";
+  h += `<div class="daynav">
+    <button class="icon-btn" data-a="day" data-n="-1" aria-label="Dia anterior">‹</button>
+    <div class="title"><span class="muted small">${isToday ? greet() : "Registrando outro dia"}</span><b>${fmtDay(k)}</b><span class="muted small">${planDay}</span></div>
+    <button class="icon-btn" data-a="day" data-n="1" aria-label="Próximo dia" ${isToday ? "disabled style='opacity:.25'" : ""}>›</button>
+  </div>`;
+  if (memoryOnly) h += `<div class="banner over">Os dados não estão sendo salvos neste modo. Abra pelo ícone na tela de início.</div>`;
+  else if (isIOS() && !isStandalone() && !ui.bannerOff) h += `<div class="banner info"><b>Instale na tela de início</b> para não perder seus registros: toque em Compartilhar e depois em "Adicionar à Tela de Início". Depois, abra sempre pelo ícone. <button class="small" style="font-weight:700;color:var(--accent);margin-top:6px" data-a="banner-off">Entendi</button></div>`;
+  if (needWeigh) h += `<button class="banner warn" style="width:100%;text-align:left" data-a="go" data-v="peso"><b>Hora de pesar ⚖️</b><br>Em jejum, depois do banheiro. Toque para lançar.</button>`;
+  h += `<div class="card"><h2>${isToday ? "Treino de hoje" : "Treino do dia"}</h2>
+    <div style="font-size:21px;font-weight:700">${esc(tr.txt)}</div><div class="note">${esc(tr.det)}</div>
+    ${!tr.rest ? `<button class="check ${d.treino ? "on" : ""}" data-a="tog" data-f="treino"><span class="box">${d.treino ? "✓" : ""}</span><span>Treino feito</span></button>` : ""}
+    <button class="check ${d.cam1 ? "on" : ""}" data-a="tog" data-f="cam1"><span class="box">${d.cam1 ? "✓" : ""}</span><span>Caminhada de 10 min depois do almoço</span></button>
+    <button class="check ${d.cam2 ? "on" : ""}" data-a="tog" data-f="cam2"><span class="box">${d.cam2 ? "✓" : ""}</span><span>Caminhada de 10 min depois do jantar</span></button>
+  </div>`;
+  const kCls = tot.k > DAY_KMAX + 30 ? "over" : "";
+  const pCls = tot.p >= DAY_PMIN ? "" : "low";
+  h += `<div class="card"><h2>Saldo do dia</h2>
+    <div class="barlabel"><span>Calorias</span><span><b>${n0(tot.k)}</b> de 1.700–1.800</span></div>${bar(tot.k, 0, DAY_KMAX, kCls)}
+    <div class="barlabel"><span>Proteína</span><span><b>${n0(tot.p)} g</b> de ${DAY_PMIN}–${DAY_PMAX} g</span></div>${bar(tot.p, 0, DAY_PMIN, pCls)}
+  </div>`;
+  h += `<div class="card"><button class="oakbtn" data-a="oak" data-on="${d.type === "oak" ? 0 : 1}"><span class="emo">🍇</span><span class="grow"><b>${d.type === "oak" ? "Hoje é dia de Oakberry" : "Hoje tem Oakberry?"}</b><br><span class="note">${d.type === "oak" ? "Toque para desfazer. Lanche vira açaí, sem docinho, jantar sem pão." : "Toque se for tomar. O app faz as trocas sozinho."}</span></span><span class="chip ${oakN >= OAK_WEEK ? "passou" : "ok"}">${oakN} de ${OAK_WEEK} na semana</span></button></div>`;
+  h += `<div class="card" style="padding:4px 0">`;
+  MEALS.forEach((m, i) => {
+    const st = status(k, m.id, T), t = T[m.id], list = items(k, m.id), mt = totalsOf(list);
+    let nome = m.nome, hora = m.hora, extra = "";
+    if (d.type === "oak" && m.id === "lanche") { nome = "Oakberry"; hora = "no lugar do lanche, de preferência depois do treino"; }
+    if (d.type === "oak" && m.id === "jantar") extra = `<div class="note warn">Hoje sem pão.</div>`;
+    if (t.adj > 0 && !list.length) extra += `<div class="note warn">Meta ajustada: −${n0(t.adj)} kcal porque o ${esc(t.adjFrom.toLowerCase())} passou da meta.${m.id === "jantar" && t.adj >= 100 ? " Dica: jantar sem pão." : ""}</div>`;
+    if (t.pBoost && !list.length) extra += `<div class="note warn">Capriche na proteína: o dia está com pouca.</div>`;
+    h += `<button class="meal" data-a="open" data-m="${m.id}" style="${i ? "border-top:1px solid var(--line)" : ""}">
+      <span class="emo">${d.type === "oak" && m.id === "lanche" ? "🍇" : m.e}</span>
+      <span class="grow"><span class="nm">${esc(nome)}</span><div class="note">${esc(hora)}${list.length ? ` · ${n0(mt.k)} kcal · ${n0(mt.p)} g prot.` : ""}</div>${extra}</span>
+      <span class="chip ${st.s}">${st.s === "ok" ? "✓ " : ""}${esc(st.txt)}</span>
+    </button>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+function viewMeal() {
+  const k = ui.day, m = ui.meal, meal = MEAL[m], d = dayObj(k), T = targets(k), t = T[m];
+  const list = items(k, m), tot = totalsOf(list), st = status(k, m, T), sg = suggestions(k, m);
+  const isOakLanche = d.type === "oak" && m === "lanche";
+  const nome = isOakLanche ? "Oakberry" : meal.nome;
+  let h = `<button class="back" data-a="go" data-v="hoje">‹ Hoje</button>`;
+  h += `<div class="row between" style="margin:4px 0 2px"><div><div style="font-size:24px;font-weight:800">${isOakLanche ? "🍇" : meal.e} ${esc(nome)}</div><div class="note">${fmtDay(k)}</div></div><span class="chip ${st.s}">${st.s === "ok" ? "✓ " : ""}${esc(st.txt)}</span></div>`;
+  if (!(m === "doce" && d.type === "oak")) {
+    h += `<div class="card">
+      <div class="barlabel"><span>Calorias</span><span><b>${n0(tot.k)}</b> de ${t.kMin ? `${n0(t.kMin)}–` : "até "}${n0(t.kMax)}</span></div>${bar(tot.k, 0, t.kMax || 1, tot.k > t.kMax + 15 ? "over" : "")}
+      ${t.pMin ? `<div class="barlabel"><span>Proteína</span><span><b>${n0(tot.p)} g</b> de pelo menos ${t.pMin} g</span></div>${bar(tot.p, 0, t.pMin, tot.p >= t.pMin - 0.5 ? "" : "low")}` : ""}
+      ${t.adj > 0 ? `<div class="note warn">Meta ajustada em −${n0(t.adj)} kcal porque o ${esc(t.adjFrom.toLowerCase())} passou da meta.</div>` : ""}
+      ${t.pBoost ? `<div class="note warn">Meta de proteína maior hoje: o dia está com pouca.</div>` : ""}
+      ${d.type === "oak" && m === "jantar" ? `<div class="note warn">Dia de Oakberry: jantar sem pão.</div>` : ""}
+    </div>`;
+  } else {
+    h += `<div class="banner info">Hoje o docinho foi trocado pelo açaí. Se comer mesmo assim, lance aqui: o app tira do jantar.</div>`;
+  }
+  if (st.s === "passou") h += `<div class="banner over">Passou ${n0(tot.k - t.kMax)} kcal. Tudo bem: o app já tirou isso das próximas refeições.</div>`;
+  h += `<div class="card"><h2>No prato</h2><div class="plate" id="plate">`;
+  if (!list.length) h += `<div class="muted small" style="padding:14px 8px;text-align:center">Toque nos cards abaixo para montar o prato.</div>`;
+  for (const it of list) {
+    const f = FOOD[it.id];
+    h += `<div class="item"><span class="emo">${f.e}</span><div class="grow"><b>${esc(f.nome)}</b><div class="note">${esc(f.porcao)} · ${n0(f.k * it.q)} kcal</div></div>
+      <div class="qty"><button data-a="q" data-id="${it.id}" data-n="-1" aria-label="Menos">−</button><b>${qtyTxt(it.q)}</b><button data-a="q" data-id="${it.id}" data-n="1" aria-label="Mais">+</button></div></div>`;
+  }
+  h += `</div></div>`;
+  if (sg.msg || sg.opts.length) {
+    h += `<div class="card"><h2>O que falta</h2>${sg.msg ? `<div style="margin-bottom:10px">${esc(sg.msg)}</div>` : ""}<div class="sugs">`;
+    sg.opts.forEach((o, i) => {
+      h += `<div class="sug"><div class="emos">${o.itens.map(([id]) => FOOD[id].e).join(" ")}</div><b>${esc(itensTxt(o.itens))}</b><div class="why">${esc(o.why)}</div><button class="btn primary block" data-a="sug" data-i="${i}">Comi isso</button></div>`;
+    });
+    h += `</div></div>`;
+  } else if (st.s === "ok") {
+    h += `<div class="banner info">✓ Refeição completa. Bom trabalho!</div>`;
+  }
+  const presets = isOakLanche ? [OAK_PRESET] : meal.presets;
+  if (presets.length) {
+    h += `<div class="small muted" style="font-weight:700;margin:14px 0 4px">Montar rápido</div><div class="presets">${presets.map((p, i) => `<button data-a="preset" data-i="${i}">${esc(p.nome)}</button>`).join("")}</div>`;
+  }
+  const cats = isOakLanche ? [["oak", "Oakberry"], ["comuns", "Comuns no lanche"]] : [["comuns", "Comuns aqui"], ...Object.entries(GROUPS).filter(([g]) => g !== "oak")];
+  if (!cats.some(([c]) => c === ui.cat)) ui.cat = cats[0][0];
+  h += `<div class="cats">${cats.map(([c, l]) => `<button class="${ui.cat === c ? "on" : ""}" data-a="cat" data-c="${c}">${esc(l)}</button>`).join("")}</div>`;
+  const foods = ui.cat === "comuns" ? meal.pref.map(id => FOOD[id]) : CATALOG.filter(f => f.g === ui.cat);
+  h += `<div class="grid">`;
+  for (const f of foods) {
+    const inP = list.find(i => i.id === f.id);
+    h += `<button class="food" draggable="true" data-a="add" data-id="${f.id}"><span class="emo">${f.e}</span><span class="fn">${esc(f.nome)}</span><span class="fp">${esc(f.porcao)}</span>${inP ? `<span class="cnt">${qtyTxt(inP.q)}</span>` : (f.p >= 5 && f.p / Math.max(f.k, 1) > 0.05 ? `<span class="tag">proteína</span>` : "")}</button>`;
+  }
+  h += `</div>`;
+  return h;
+}
+
+function weightChart(ws) {
+  if (ws.length < 1) return `<div class="muted small">O gráfico aparece depois da primeira pesagem.</div>`;
+  const W = 340, H = 190, L = 40, R = 14, TOP = 14, B = 30;
+  const xs = ws.map(w => dateOf(w.date).getTime()), ys = ws.map(w => w.kg);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.floor(Math.min(...ys) - 1), y1 = Math.ceil(Math.max(...ys) + 1);
+  const X = x => x1 === x0 ? (L + W - R) / 2 : L + (x - x0) / (x1 - x0) * (W - L - R);
+  const Y = y => TOP + (y1 - y) / (y1 - y0) * (H - TOP - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Curva de peso">`;
+  const step = Math.max(1, Math.round((y1 - y0) / 4));
+  for (let y = y0; y <= y1; y += step) s += `<line x1="${L}" x2="${W - R}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(y) + 4}" font-size="11" text-anchor="end" fill="var(--soft)">${y}</text>`;
+  s += `<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${ws.map(w => `${X(dateOf(w.date).getTime())},${Y(w.kg)}`).join(" ")}"/>`;
+  ws.forEach(w => { s += `<circle cx="${X(dateOf(w.date).getTime())}" cy="${Y(w.kg)}" r="4.5" fill="var(--accent)"/>`; });
+  s += `<text x="${L}" y="${H - 8}" font-size="11" fill="var(--soft)">${fmtShort(ws[0].date)}</text>`;
+  if (ws.length > 1) s += `<text x="${W - R}" y="${H - 8}" font-size="11" text-anchor="end" fill="var(--soft)">${fmtShort(ws[ws.length - 1].date)}</text>`;
+  return s + `</svg>`;
+}
+function viewPeso() {
+  const ws = data.weights.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  const first = ws[0], last = ws[ws.length - 1];
+  let h = `<h2 style="font-size:24px;margin:8px 0">Peso e medidas</h2>`;
+  h += `<div class="card"><h2>Lançar pesagem</h2>
+    <div class="field"><label for="kg">Peso (kg), em jejum</label><input id="kg" inputmode="decimal" placeholder="ex.: 99,5"></div>
+    <div class="field"><label for="cm">Cintura (cm), opcional, na altura do umbigo</label><input id="cm" inputmode="decimal" placeholder="ex.: 108"></div>
+    <div class="field"><label for="wd">Data</label><input id="wd" type="date" value="${todayKey()}" max="${todayKey()}"></div>
+    <button class="btn primary block" data-a="save-w">Salvar</button></div>`;
+  h += `<div class="card"><h2>Curva de peso</h2>${weightChart(ws)}
+    ${ws.length > 1 ? `<div style="margin-top:8px"><b>${n1(last.kg - first.kg).replace(/^(?!-)/, "+")} kg</b> <span class="muted">desde ${fmtShort(first.date)}</span></div>` : ""}</div>`;
+  if (ws.length) {
+    h += `<div class="card list"><h2>Histórico</h2>${ws.slice().reverse().map(w => `<div class="li"><span>${fmtShort(w.date)}</span><span><b>${n1(w.kg)} kg</b>${w.cm ? ` · ${n1(w.cm)} cm` : ""}</span><button class="icon-btn" style="font-size:18px" data-a="del-w" data-d="${w.date}" aria-label="Apagar">🗑️</button></div>`).join("")}</div>`;
+  }
+  return h;
+}
+function weekSummary(k) {
+  const days = weekDays(k), today = todayKey();
+  let treinos = 0, treinosPlan = 0, verdes = 0, lancadas = 0, ovos = 0;
+  for (const dk of days) {
+    if (dk > today) continue;
+    const tr = training(dk);
+    if (!tr.rest && tr.idx >= 0) { treinosPlan++; if (data.days[dk] && data.days[dk].treino) treinos++; }
+    const T = targets(dk);
+    for (const m of MEALS) {
+      if (!items(dk, m.id).length) continue;
+      lancadas++; if (status(dk, m.id, T).s === "ok") verdes++;
+    }
+  }
+  ovos = eggsInWeek(k);
+  const ws = data.weights.filter(w => w.date >= days[0] && w.date <= days[6]).sort((a, b) => a.date < b.date ? -1 : 1);
+  return {days, treinos, treinosPlan, verdes, lancadas, ovos, oak: oakInWeek(k), peso: ws.length ? ws[ws.length - 1] : null};
+}
+function summaryText(s) {
+  const allW = data.weights.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  let t = `Resumo da semana (${fmtShort(s.days[0])} a ${fmtShort(s.days[6])})\n`;
+  t += `Treinos: ${s.treinos} de ${s.treinosPlan}\n`;
+  t += `Refeições no verde: ${s.verdes} de ${s.lancadas} lançadas\n`;
+  t += `Açaí: ${s.oak} de ${OAK_WEEK}\n`;
+  t += `Ovos: ${n0(s.ovos)} de ${EGGS_WEEK}\n`;
+  if (s.peso) t += `Peso: ${n1(s.peso.kg)} kg` + (allW.length > 1 ? ` (${n1(s.peso.kg - allW[0].kg).replace(/^(?!-)/, "+")} kg desde o início)` : "") + `\n`;
+  return t;
+}
+function viewSemana() {
+  const s = weekSummary(ui.day);
+  let h = `<h2 style="font-size:24px;margin:8px 0">Semana</h2><div class="muted small">${fmtShort(s.days[0])} a ${fmtShort(s.days[6])}</div>`;
+  h += `<div class="stat" style="margin-top:10px">
+    <div class="s"><span class="muted small">Treinos</span><b>${s.treinos} de ${s.treinosPlan}</b></div>
+    <div class="s"><span class="muted small">Refeições no verde</span><b>${s.verdes} de ${s.lancadas}</b></div>
+    <div class="s"><span class="muted small">Açaí</span><b>${s.oak} de ${OAK_WEEK}</b></div>
+    <div class="s"><span class="muted small">Ovos</span><b>${n0(s.ovos)} de ${EGGS_WEEK}</b></div>
+  </div>`;
+  h += `<div class="card"><h2>Dia a dia</h2>${s.days.map(dk => {
+    const T = targets(dk), st = MEALS.map(m => status(dk, m.id, T).s);
+    const dots = st.map(x => `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;margin-left:4px;background:${x === "ok" ? "var(--accent)" : x === "falta" ? "var(--warn)" : x === "passou" ? "var(--over)" : "var(--chip)"}"></span>`).join("");
+    const d = data.days[dk];
+    return `<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${DOW[weekday(dk)].slice(0, 3)} ${fmtShort(dk)}${d && d.type === "oak" ? " 🍇" : ""}${d && d.treino ? " 💪" : ""}</span><span>${dots}</span></div>`;
+  }).join("")}<div class="note" style="margin-top:8px">Bolinhas: café, almoço, docinho, lanche e jantar. Verde = ok, amarelo = faltou algo, laranja = passou.</div></div>`;
+  h += `<div class="card"><h2>Mandar para o Marcelo</h2><div class="note" style="margin-bottom:10px">Envia o resumo da semana pelo WhatsApp.</div>
+    <a class="btn primary block" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(summaryText(s))}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+    <button class="btn block" style="margin-top:10px" data-a="copy">Copiar resumo</button></div>`;
+  h += `<div class="card"><h2>Cópia de segurança</h2><div class="note" style="margin-bottom:10px">Seus registros ficam só neste celular. Salve uma cópia de vez em quando (por exemplo, no WhatsApp ou no e-mail).</div>
+    <button class="btn block" data-a="export">Salvar cópia dos dados</button>
+    <label class="btn block" style="margin-top:10px">Restaurar uma cópia<input type="file" accept="application/json,.json" id="imp" class="sr"></label></div>`;
+  return h;
+}
+function viewPorque() {
+  const W = [
+    ["Proteína em toda refeição", "Segura o músculo enquanto você emagrece. Parte do peso perdido com remédio costuma ser músculo."],
+    ["Fruta inteira no lugar do suco", "A fruta tem fibra e sustenta. O suco sobe a glicose rápido e não mata a fome."],
+    ["Docinho depois do almoço", "Junto com a refeição, o açúcar sobe menos a glicose do que sozinho. Por isso ele entra no lugar da fruta."],
+    ["Oakberry até 2 vezes por semana", "O limite é o açúcar. Com 2 açaís e o docinho diário, fica abaixo do limite da OMS."],
+    ["Açaí logo depois do treino", "O músculo que acabou de trabalhar puxa mais glicose."],
+    ["10 minutos de caminhada depois de comer", "Reduz o pico de glicose depois da refeição."],
+    ["Musculação nunca sai da semana", "É o que protege músculo e osso durante o emagrecimento."],
+    ["Cardio no ritmo de conversa", "É o ritmo seguro até o médico liberar esforço forte."],
+    ["Ovos até 12 por semana", "Nessa quantidade, não pioraram colesterol nem glicose em pessoas com diabetes."],
+    ["Nunca menos de 1.500 kcal no dia", "Abaixo disso, o risco é perder músculo e ter queda de glicose."],
+    ["Pesar 1 vez por semana, em jejum", "O peso oscila de um dia para o outro. O que importa é a tendência."]
+  ];
+  let h = `<h2 style="font-size:24px;margin:8px 0">Por quê?</h2><div class="card why-list">${W.map(([a, b]) => `<div class="w"><b>${esc(a)}</b><span class="muted">${esc(b)}</span></div>`).join("")}</div>`;
+  h += `<div class="banner warn">Este app organiza o seu plano. Não substitui médico nem nutricionista; em dúvida, fale com eles.</div>`;
+  h += `<div class="card"><h2>Ajustes</h2>
+    <div class="field"><label for="st">Data de início do plano</label><input id="st" type="date" value="${data.start}"></div>
+    <button class="btn block" data-a="save-start">Salvar data de início</button>
+    <button class="btn danger block" style="margin-top:10px" data-a="reset">Apagar todos os registros</button></div>`;
+  return h;
+}
+function viewModal() {
+  const md = ui.modal; if (!md) return "";
+  return `<div class="overlay" data-a="modal-bg"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(md.title)}"><h3>${esc(md.title)}</h3>${md.body}<div class="acts">${md.actions.map(x => `<button class="btn ${x.primary ? "primary" : x.danger ? "danger" : ""} block" data-a="${x.a}">${esc(x.label)}</button>`).join("")}</div></div></div>`;
+}
+function helpModal() {
+  ui.modal = {title: "Não estou bem",
+    body: `<p><b>Dor ou aperto no peito, falta de ar fora do normal, tontura ou coração disparado:</b> pare o treino e procure atendimento. Em emergência, ligue <b>192</b> (SAMU).</p>
+      <p><b>Tremor, suor frio ou fome de repente:</b> pare, tome 150 ml de suco e, se tiver aparelho, meça a glicemia. Espere 15 minutos e meça de novo.</p>
+      <p><b>Dor em articulação por mais de 48 horas:</b> avise o personal antes do próximo treino.</p>`,
+    actions: [{label: "Ligar 192", a: "call192", danger: true}, {label: "Fechar", a: "modal-close", primary: true}]};
+}
+
+function render() {
+  const app = document.getElementById("app");
+  const y = window.scrollY;
+  let main = "";
+  if (ui.view === "hoje") main = viewHoje();
+  else if (ui.view === "refeicao") main = viewMeal();
+  else if (ui.view === "peso") main = viewPeso();
+  else if (ui.view === "semana") main = viewSemana();
+  else if (ui.view === "porque") main = viewPorque();
+  const tab = v => (ui.view === v || (v === "hoje" && ui.view === "refeicao")) ? "on" : "";
+  app.innerHTML = `
+    <header class="top"><h1>Meu Plano</h1><button class="help-btn" data-a="help">Não estou bem</button></header>
+    <main class="wrap">${main}</main>
+    <nav class="tabs"><div class="in">
+      <button class="${tab("hoje")}" data-a="go" data-v="hoje"><span>🏠</span>Hoje</button>
+      <button class="${tab("peso")}" data-a="go" data-v="peso"><span>⚖️</span>Peso</button>
+      <button class="${tab("semana")}" data-a="go" data-v="semana"><span>📅</span>Semana</button>
+      <button class="${tab("porque")}" data-a="go" data-v="porque"><span>💡</span>Por quê?</button>
+    </div></nav>
+    ${ui.toast ? `<div class="toast" role="status"><span>${esc(ui.toast.msg)}</span>${ui.toast.undo && undoSnap ? `<button data-a="undo">Desfazer</button>` : ""}</div>` : ""}
+    ${viewModal()}`;
+  const where = ui.view + "|" + (ui.meal || "") + "|" + ui.day;
+  if (where !== lastWhere) window.scrollTo(0, 0); else window.scrollTo(0, y);
+  lastWhere = where;
+  const imp = document.getElementById("imp");
+  if (imp) imp.addEventListener("change", onImport);
+  bindDrag();
+}
+
+/* ---------- arrastar (computador) ---------- */
+function bindDrag() {
+  const plate = document.getElementById("plate"); if (!plate) return;
+  document.querySelectorAll(".food[draggable]").forEach(el => el.addEventListener("dragstart", e => e.dataTransfer.setData("text/plain", el.dataset.id)));
+  plate.addEventListener("dragover", e => { e.preventDefault(); plate.classList.add("drag"); });
+  plate.addEventListener("dragleave", () => plate.classList.remove("drag"));
+  plate.addEventListener("drop", e => {
+    e.preventDefault(); plate.classList.remove("drag");
+    const id = e.dataTransfer.getData("text/plain");
+    if (FOOD[id]) { addItems(ui.day, ui.meal, [[id, FOOD[id].step === 0.5 ? 1 : 1]]); ui.keepScroll = true; render(); }
+  });
+}
+
+/* ---------- cliques ---------- */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-a]"); if (!el) return;
+  const a = el.dataset.a, k = ui.day;
+  if (a === "modal-bg" && e.target !== el) return;
+  switch (a) {
+    case "go": ui.view = el.dataset.v; ui.meal = null; break;
+    case "day": { const n = Number(el.dataset.n), nk = addDays(k, n); if (nk <= todayKey()) ui.day = nk; break; }
+    case "open": ui.meal = el.dataset.m; ui.view = "refeicao"; ui.cat = (dayObj(k).type === "oak" && ui.meal === "lanche") ? "oak" : "comuns"; break;
+    case "tog": { snapshot(k); const d = dayObj(k, true); d[el.dataset.f] = !d[el.dataset.f]; save(); ui.keepScroll = true; break; }
+    case "oak": setOak(k, el.dataset.on === "1"); ui.keepScroll = true; break;
+    case "oak-force": ui.modal = null; setOak(k, true, true); ui.keepScroll = true; break;
+    case "add": { const f = FOOD[el.dataset.id]; addItems(k, ui.meal, [[f.id, 1]]); ui.keepScroll = true; break; }
+    case "q": changeQty(k, ui.meal, el.dataset.id, Number(el.dataset.n)); ui.keepScroll = true; break;
+    case "sug": { const sg = suggestions(k, ui.meal), o = sg.opts[Number(el.dataset.i)]; if (o) addItems(k, ui.meal, o.itens); ui.keepScroll = true; break; }
+    case "preset": { const d = dayObj(k); const ps = (d.type === "oak" && ui.meal === "lanche") ? [OAK_PRESET] : MEAL[ui.meal].presets; const p = ps[Number(el.dataset.i)]; if (p) addItems(k, ui.meal, p.itens, p.nome); ui.keepScroll = true; break; }
+    case "cat": ui.cat = el.dataset.c; ui.keepScroll = true; break;
+    case "undo": if (undoSnap) { data.days[undoSnap.k] = undoSnap.day; undoSnap = null; save(); ui.toast = null; } ui.keepScroll = true; break;
+    case "help": helpModal(); ui.keepScroll = true; break;
+    case "call192": location.href = "tel:192"; break;
+    case "modal-close": case "modal-bg": ui.modal = null; ui.keepScroll = true; break;
+    case "banner-off": ui.bannerOff = true; ui.keepScroll = true; break;
+    case "save-w": {
+      const kg = parseFloat((document.getElementById("kg").value || "").replace(",", "."));
+      const cm = parseFloat((document.getElementById("cm").value || "").replace(",", "."));
+      const date = document.getElementById("wd").value || todayKey();
+      if (!(kg > 30 && kg < 300)) { toast("Digite o peso em kg, por exemplo 99,5."); break; }
+      data.weights = data.weights.filter(w => w.date !== date);
+      data.weights.push({date, kg: Math.round(kg * 10) / 10, cm: cm > 40 && cm < 250 ? Math.round(cm * 10) / 10 : null});
+      save(); toast("Pesagem salva.");
+      break;
+    }
+    case "del-w": data.weights = data.weights.filter(w => w.date !== el.dataset.d); save(); ui.keepScroll = true; break;
+    case "copy": { const txt = summaryText(weekSummary(k)); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => { toast("Resumo copiado."); render(); }, () => { toast("Não deu para copiar neste aparelho."); render(); }); return; }
+    case "export": exportData(); return;
+    case "save-start": { const v = document.getElementById("st").value; if (v) { data.start = v; save(); toast("Data de início salva."); } break; }
+    case "reset": ui.modal = {title: "Apagar tudo?", body: "<p>Todos os registros deste celular serão apagados. Isso não tem volta. Se quiser, salve uma cópia antes na tela Semana.</p>", actions: [{label: "Cancelar", a: "modal-close", primary: true}, {label: "Apagar tudo", a: "reset-yes", danger: true}]}; ui.keepScroll = true; break;
+    case "reset-yes": data = blank(); save(); ui.modal = null; ui.view = "hoje"; ui.day = todayKey(); toast("Registros apagados."); break;
+    default: return;
+  }
+  render();
+});
+
+/* ---------- cópia de segurança ---------- */
+function exportData() {
+  const name = `meu-plano-copia-${todayKey()}.json`;
+  const blob = new Blob([JSON.stringify(data, null, 1)], {type: "application/json"});
+  try {
+    const file = new File([blob], name, {type: "application/json"});
+    if (navigator.canShare && navigator.canShare({files: [file]})) {
+      navigator.share({files: [file], title: "Cópia do Meu Plano"}).catch(() => {});
+      return;
+    }
+  } catch (e) {}
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast("Cópia salva."); render();
+}
+function onImport(e) {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d || d.version !== VERSION || typeof d.days !== "object") throw new Error("formato");
+      ui.modal = {title: "Restaurar esta cópia?", body: `<p>Os registros atuais deste celular serão trocados pelos da cópia (${Object.keys(d.days).length} dias, ${Array.isArray(d.weights) ? d.weights.length : 0} pesagens).</p>`,
+        actions: [{label: "Restaurar", a: "import-yes", primary: true}, {label: "Cancelar", a: "modal-close"}]};
+      pendingImport = d;
+    } catch (err) { toast("Esse arquivo não é uma cópia do Meu Plano."); }
+    render();
+  };
+  r.readAsText(f);
+}
+let pendingImport = null;
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-a='import-yes']"); if (!el || !pendingImport) return;
+  data = pendingImport; data.weights = Array.isArray(data.weights) ? data.weights : []; pendingImport = null; save();
+  ui.modal = null; toast("Cópia restaurada."); render();
+});
+
+/* ---------- início ---------- */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+window.MeuPlano = {data: () => data, targets, suggestions, status, dayTotals, totalsOf, FOOD, MEALS};
+render();
+</script>
+</body>
+</html>
