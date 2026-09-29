@@ -130,6 +130,19 @@ nav.tabs button.on{color:var(--accent)}
 .back{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--accent);min-height:44px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 svg text{font-family:inherit}
+.note16{font-size:16px;color:var(--soft);margin-top:4px}
+.note16.warn{color:var(--warn)}
+.search input{width:100%;min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:10px 14px;font-size:18px}
+.sizes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 8px}
+.size{border:2px solid var(--line);border-radius:14px;padding:10px 12px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font-size:16px}
+.size b{font-size:20px}
+.size.on{border-color:var(--accent);background:var(--accent-bg)}
+.repeat{display:grid;gap:10px;margin:10px 0}
+.dayrow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:12px 4px;min-height:56px;border-bottom:1px solid var(--line);font-size:16px}
+.onb-txt{font-size:20px;line-height:1.4;margin:6px 0 10px}
+.onb-step{font-size:16px;color:var(--soft);font-weight:700;margin-bottom:6px}
+.onb-cores{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
+.onb-cores .chip{font-size:16px}
 </style>
 </head>
 <body>
@@ -146,7 +159,7 @@ const VERSION = 1;
 const STORE_KEY = "meuPlano.v1";
 
 /* ---------- catálogo de cards ---------- */
-const GROUPS = {prot:"Proteínas", lat:"Laticínios", pao:"Pães e cereais", fruta:"Frutas e legumes", doce:"Doces", beb:"Bebidas", extra:"Extras", oak:"Oakberry"};
+const GROUPS = {prot:"Proteínas", lat:"Laticínios", pao:"Pães e cereais", fruta:"Frutas e legumes", doce:"Doces", beb:"Bebidas", extra:"Extras", fora:"Fora do plano", oak:"Oakberry"};
 const CATALOG = [
   {id:"ovo", nome:"Ovo", e:"🥚", g:"prot", porcao:"1 unidade", k:73, p:6.7, maxQ:3},
   {id:"frango", nome:"Frango grelhado", e:"🍗", g:"prot", porcao:"1 filé do tamanho da palma", k:159, p:32, maxQ:1},
@@ -190,33 +203,98 @@ const CATALOG = [
   {id:"oak500", nome:"Açaí Oakberry 500 ml", e:"🍇", g:"oak", porcao:"1 copo, sem acompanhamento", k:516, p:0, oak:true, maxQ:1},
   {id:"oakwhey", nome:"Whey no açaí", e:"💪", g:"oak", porcao:"28 g", k:112, p:20, maxQ:1},
   {id:"oakmorango", nome:"Morango no açaí", e:"🍓", g:"oak", porcao:"1 porção", k:12, p:0, maxQ:1},
-  {id:"oakbanana", nome:"Banana no açaí", e:"🍌", g:"oak", porcao:"1 porção", k:59, p:0.8, maxQ:1}
+  {id:"oakbanana", nome:"Banana no açaí", e:"🍌", g:"oak", porcao:"1 porção", k:59, p:0.8, maxQ:1},
+  /* versão 2: alimentos novos (TACO, IBGE, USDA e rótulos). est = estimativa: o card mostra "~" */
+  {id:"sobrecoxa", nome:"Sobrecoxa sem pele assada", e:"🍗", g:"prot", porcao:"1 unidade (~90 g)", k:210, p:26.3, maxQ:1},
+  {id:"coxa", nome:"Coxa de frango sem pele", e:"🍗", g:"prot", porcao:"1 unidade (~70 g)", k:117, p:18.8},
+  {id:"bife", nome:"Bife de patinho grelhado", e:"🥩", g:"prot", porcao:"1 bife médio (100 g)", k:219, p:35.9, maxQ:1},
+  {id:"carne_panela", nome:"Carne de panela", e:"🍖", g:"prot", porcao:"1 pedaço (100 g)", k:215, p:27.3, maxQ:1},
+  {id:"almondega", nome:"Almôndega caseira", e:"🧆", g:"prot", porcao:"3 unidades (~90 g)", k:193, p:18.6, maxQ:1},
+  {id:"tilapia", nome:"Tilápia grelhada", e:"🐟", g:"prot", porcao:"1 filé (120 g)", k:154, p:31.4, maxQ:1},
+  {id:"atum", nome:"Atum em água", e:"🐟", g:"prot", porcao:"1 lata escorrida (~120 g)", k:139, p:30.6, maxQ:1},
+  {id:"presunto", nome:"Presunto magro", e:"🍖", g:"prot", porcao:"1 fatia (15 g)", k:14, p:2.1, maxQ:3},
+  {id:"queijo_prato", nome:"Queijo prato", e:"🧀", g:"lat", porcao:"1 fatia (20 g)", k:72, p:4.5},
+  {id:"ricota", nome:"Ricota", e:"🧀", g:"lat", porcao:"1 fatia (30 g)", k:42, p:3.8},
+  {id:"cottage", nome:"Queijo cottage", e:"🥣", g:"lat", porcao:"2 colheres de sopa (50 g)", k:46, p:6},
+  {id:"iog_prot", nome:"Iogurte proteico natural", e:"🥣", g:"lat", porcao:"1 pote (160 g)", k:93, p:17.6, maxQ:1},
+  {id:"arroz_int", nome:"Arroz integral", e:"🍚", g:"pao", porcao:"1 colher de sopa cheia (25 g)", k:31, p:0.7, maxQ:4},
+  {id:"batata", nome:"Batata cozida", e:"🥔", g:"pao", porcao:"1 média (130 g)", k:68, p:1.6},
+  {id:"batata_doce", nome:"Batata-doce cozida", e:"🍠", g:"pao", porcao:"1 pedaço (100 g)", k:77, p:0.6},
+  {id:"mandioca", nome:"Mandioca cozida", e:"🥔", g:"pao", porcao:"1 pedaço (100 g)", k:125, p:0.6, maxQ:1},
+  {id:"cuscuz", nome:"Cuscuz de milho", e:"🌽", g:"pao", porcao:"1 fatia (100 g)", k:113, p:2.2, pao:true, maxQ:1},
+  {id:"pao_queijo", nome:"Pão de queijo", e:"🥯", g:"pao", porcao:"1 pequeno (20 g)", k:73, p:1, pao:true, maxQ:3},
+  {id:"cream_cracker", nome:"Biscoito cream cracker", e:"🍘", g:"pao", porcao:"3 unidades (18 g)", k:78, p:1.8, pao:true},
+  {id:"maisena", nome:"Biscoito maisena", e:"🍪", g:"pao", porcao:"4 unidades (20 g)", k:89, p:1.6, maxQ:1},
+  {id:"sucrilhos", nome:"Cereal de milho (Sucrilhos)", e:"🥣", g:"pao", porcao:"30 g", k:110, p:1.4, maxQ:1},
+  {id:"milho", nome:"Milho verde", e:"🌽", g:"pao", porcao:"2 colheres de sopa (30 g)", k:29, p:1},
+  {id:"laranja", nome:"Laranja", e:"🍊", g:"fruta", porcao:"1 unidade (140 g)", k:52, p:1.4, maxQ:1},
+  {id:"tangerina", nome:"Mexerica", e:"🍊", g:"fruta", porcao:"1 unidade (135 g)", k:51, p:1.1, maxQ:1},
+  {id:"uva", nome:"Uva", e:"🍇", g:"fruta", porcao:"1 cacho pequeno (100 g)", k:53, p:0.7, maxQ:1},
+  {id:"melancia", nome:"Melancia", e:"🍉", g:"fruta", porcao:"1 fatia (200 g)", k:66, p:1.8, maxQ:1},
+  {id:"abacaxi", nome:"Abacaxi", e:"🍍", g:"fruta", porcao:"1 fatia (100 g)", k:48, p:0.9, maxQ:1},
+  {id:"manga", nome:"Manga", e:"🥭", g:"fruta", porcao:"½ unidade (150 g)", k:108, p:0.6, maxQ:1},
+  {id:"pera", nome:"Pera", e:"🍐", g:"fruta", porcao:"1 unidade (130 g)", k:69, p:0.8, maxQ:1},
+  {id:"melao", nome:"Melão", e:"🍈", g:"fruta", porcao:"1 fatia (150 g)", k:44, p:1.1, maxQ:1},
+  {id:"abacate", nome:"Abacate", e:"🥑", g:"fruta", porcao:"2 colheres de sopa (45 g)", k:43, p:0.5, maxQ:1},
+  {id:"salada", nome:"Salada de alface e tomate", e:"🥗", g:"fruta", porcao:"1 prato (100 g)", k:13, p:1.2},
+  {id:"cenoura", nome:"Cenoura ralada", e:"🥕", g:"fruta", porcao:"2 colheres de sopa (25 g)", k:9, p:0.3},
+  {id:"brocolis", nome:"Brócolis", e:"🥦", g:"fruta", porcao:"1 pires (100 g)", k:25, p:2.1},
+  {id:"sorvete", nome:"Sorvete", e:"🍨", g:"doce", porcao:"1 bola (60 g)", k:124, p:2.2},
+  {id:"picole", nome:"Picolé de fruta", e:"🍦", g:"doce", porcao:"1 unidade (~65 g)", k:51, p:0},
+  {id:"gelatina", nome:"Gelatina zero", e:"🟩", g:"doce", porcao:"1 pote (~125 g pronta)", k:9, p:0},
+  {id:"pudim", nome:"Pudim de leite", e:"🍮", g:"doce", porcao:"1 fatia pequena (60 g)", k:100, p:3, est:true},
+  {id:"bolo", nome:"Bolo simples", e:"🍰", g:"doce", porcao:"1 fatia pequena (40 g)", k:140, p:2, est:true},
+  {id:"recheado", nome:"Biscoito recheado", e:"🍪", g:"doce", porcao:"2 unidades (25 g)", k:118, p:1.6},
+  {id:"cafe", nome:"Café sem açúcar", e:"☕", g:"beb", porcao:"1 xícara", k:0, p:0},
+  {id:"agua_coco", nome:"Água de coco", e:"🥥", g:"beb", porcao:"1 copo (200 ml)", k:44, p:0, maxQ:1},
+  {id:"suco_laranja", nome:"Suco de laranja natural", e:"🍊", g:"beb", porcao:"1 copo pequeno (200 ml)", k:66, p:1.4, suco:true, maxQ:1},
+  {id:"pizza", nome:"Pizza de muçarela", e:"🍕", g:"fora", porcao:"1 fatia (~100 g)", k:281, p:14.6},
+  {id:"cheeseburger", nome:"Cheeseburger do McDonald's", e:"🍔", g:"fora", porcao:"1 unidade", k:291, p:15},
+  {id:"batata_frita", nome:"Batata frita pequena (McDonald's)", e:"🍟", g:"fora", porcao:"1 porção", k:171, p:2},
+  {id:"coxinha", nome:"Coxinha", e:"🥟", g:"fora", porcao:"1 média (~90 g)", k:250, p:8.5},
+  {id:"pastel", nome:"Pastel de queijo", e:"🥟", g:"fora", porcao:"1 pequeno (~70 g)", k:295, p:6.1, step:0.5},
+  {id:"esfiha", nome:"Esfiha de carne (Habib's)", e:"🫓", g:"fora", porcao:"1 unidade", k:152, p:5.5},
+  {id:"refri_normal", nome:"Refrigerante normal", e:"🥤", g:"fora", porcao:"1 lata (350 ml)", k:149, p:0},
+  {id:"cerveja", nome:"Cerveja", e:"🍺", g:"fora", porcao:"1 lata (350 ml)", k:144, p:2.1},
+  {id:"vinho", nome:"Vinho tinto", e:"🍷", g:"fora", porcao:"1 taça (150 ml)", k:127, p:0},
+  {id:"oak270", nome:"Açaí Oakberry 270 ml (One)", e:"🍇", g:"oak", porcao:"1 copo", k:279, p:0, oak:true, maxQ:1},
+  {id:"oak350", nome:"Açaí Oakberry 350 ml (Classic)", e:"🍇", g:"oak", porcao:"1 copo", k:361, p:0, oak:true, maxQ:1},
+  {id:"oak720", nome:"Açaí Oakberry 720 ml (The Oak)", e:"🍇", g:"oak", porcao:"1 copo", k:743, p:0, oak:true, maxQ:1},
+  {id:"oakwhey14", nome:"Whey no açaí (meia dose)", e:"💪", g:"oak", porcao:"14 g", k:62, p:11, maxQ:1},
+  {id:"oakmaracuja", nome:"Maracujá no açaí", e:"🟡", g:"oak", porcao:"30 g", k:20, p:0.2, maxQ:1},
+  {id:"oakmel", nome:"Mel no açaí", e:"🍯", g:"oak", porcao:"15 g", k:50, p:0, maxQ:1},
+  {id:"oakpacoca", nome:"Paçoca no açaí", e:"🥜", g:"oak", porcao:"20 g", k:106, p:2.9, maxQ:1},
+  {id:"oakpacocazero", nome:"Paçoca zero no açaí", e:"🥜", g:"oak", porcao:"15 g", k:86, p:2.3, maxQ:1},
+  {id:"oakpasta", nome:"Pasta de amendoim com mel", e:"🥜", g:"oak", porcao:"20 g", k:113, p:4.7, maxQ:1},
+  {id:"oakamendoim", nome:"Amendoim no açaí", e:"🥜", g:"oak", porcao:"16 g", k:105, p:3.6, maxQ:1},
+  {id:"oakgranola", nome:"Granola banana e cacau", e:"🥣", g:"oak", porcao:"30 g", k:115, p:3.3, maxQ:1},
+  {id:"oakgranola2", nome:"Granola de castanhas", e:"🥣", g:"oak", porcao:"30 g", k:117, p:3.3, maxQ:1}
 ];
 const FOOD = Object.fromEntries(CATALOG.map(f => [f.id, f]));
 
 /* ---------- refeições e metas (plano de 15 dias) ---------- */
 const MEALS = [
   {id:"cafe", nome:"Café da manhã", e:"☀️", hora:"7h–8h", kMin:350, kMax:450, pMin:25,
-   pref:["leite","ovo","paofr","muss","minas","paoint","peru","iogurte","aveia","banana","morango","achoc","whey","maca","mamao","req"],
+   pref:["leite","ovo","paofr","muss","minas","paoint","peru","iogurte","aveia","banana","morango","achoc","whey","maca","mamao","req","presunto","queijo_prato","ricota","cottage","iog_prot","cuscuz","pao_queijo","cream_cracker","maisena","sucrilhos","laranja","tangerina","uva","melancia","abacaxi","manga","pera","melao","abacate","cafe","suco_laranja"],
    presets:[
      {nome:"Vitamina", itens:[["leite",1],["whey",1],["banana",1],["aveia",2]]},
      {nome:"Ovos com pão", itens:[["ovo",3],["muss",1],["paofr",1]]},
      {nome:"Misto quente + leite", itens:[["paoint",2],["muss",2],["peru",2],["leite",1]]}
    ]},
   {id:"almoco", nome:"Almoço", e:"🍽️", hora:"12h–13h", kMin:450, kMax:550, pMin:30,
-   pref:["arroz","feijao","legumes","frango","frango_emp","hamb","carne","strog","macarrao","molho","azeite"],
+   pref:["arroz","feijao","legumes","frango","frango_emp","hamb","carne","strog","macarrao","molho","azeite","sobrecoxa","coxa","bife","carne_panela","almondega","tilapia","atum","arroz_int","batata","batata_doce","mandioca","milho","salada","cenoura","brocolis","suco_laranja"],
    presets:[{nome:"Prato base (arroz, feijão, legumes)", itens:[["arroz",4],["feijao",1],["legumes",1],["azeite",1]]}]},
   {id:"doce", nome:"Docinho", e:"🍬", hora:"depois do almoço", kMin:0, kMax:110, pMin:0,
-   pref:["pacoca","bombom","brigadeiro","goiabada","doceleite","chocolate","mamao","banana","morango"], presets:[]},
+   pref:["pacoca","bombom","brigadeiro","goiabada","doceleite","chocolate","mamao","banana","morango","maisena","laranja","tangerina","uva","melancia","abacaxi","manga","pera","melao","sorvete","picole","gelatina","pudim","bolo","recheado"], presets:[]},
   {id:"lanche", nome:"Lanche", e:"🥪", hora:"16h–17h", kMin:250, kMax:350, pMin:15,
-   pref:["paoint","frango_desf","req","leite","achoc","paofr","minas","iogurte","maca","banana","muss","peru"],
+   pref:["paoint","frango_desf","req","leite","achoc","paofr","minas","iogurte","maca","banana","muss","peru","atum","presunto","queijo_prato","ricota","cottage","iog_prot","pao_queijo","cream_cracker","maisena","sucrilhos","laranja","tangerina","uva","melancia","abacaxi","manga","pera","melao","abacate","bolo","cafe","agua_coco","suco_laranja"],
    presets:[
      {nome:"Sanduíche de frango", itens:[["paoint",2],["frango_desf",3],["req",1],["maca",1]]},
      {nome:"Leite com achocolatado e pão", itens:[["leite",1],["achoc",1],["paofr",1],["minas",1]]},
      {nome:"Iogurte com fruta", itens:[["iogurte",1],["maca",1],["minas",2]]}
    ]},
   {id:"jantar", nome:"Jantar", e:"🌙", hora:"19h30–20h30", kMin:350, kMax:470, pMin:25,
-   pref:["ovo","muss","paofr","legumes","frango_desf","rap10","molho","hamb","paohamb","tapioca","minas","frango"],
+   pref:["ovo","muss","paofr","legumes","frango_desf","rap10","molho","hamb","paohamb","tapioca","minas","frango","sobrecoxa","coxa","bife","carne_panela","almondega","tilapia","atum","presunto","queijo_prato","batata","batata_doce","mandioca","cuscuz","milho","salada","cenoura","brocolis"],
    presets:[
      {nome:"Omelete com pão", itens:[["ovo",3],["muss",1],["paofr",1],["legumes",1]]},
      {nome:"Pizza de rap10", itens:[["rap10",1],["molho",1],["frango_desf",5],["muss",1.5]]},
@@ -226,6 +304,11 @@ const MEALS = [
 ];
 const MEAL = Object.fromEntries(MEALS.map(m => [m.id, m]));
 const OAK_PRESET = {nome:"Oakberry do plano (açaí + whey + morango)", itens:[["oak500",1],["oakwhey",1],["oakmorango",1]]};
+/* Oakberry configurável: tamanho do copo + acompanhamentos (tabela oficial) */
+const OAK_CUPS = ["oak270", "oak350", "oak500", "oak720"];
+const OAK_SIZE = {oak270: {ml: 270, apelido: "One"}, oak350: {ml: 350, apelido: "Classic"}, oak500: {ml: 500, apelido: "Work"}, oak720: {ml: 720, apelido: "The Oak"}};
+const OAK_TOPS = ["oakwhey", "oakwhey14", "oakmorango", "oakbanana", "oakmaracuja", "oakmel", "oakpacoca", "oakpacocazero", "oakpasta", "oakamendoim", "oakgranola", "oakgranola2"];
+const OAK_SEM_PAO = 550; // copo padrão acima disso: jantar 280–360 kcal e sem pão
 const DAY_KMIN = 1700, DAY_KMAX = 1800, DAY_PMIN = 100, DAY_PMAX = 130, DAY_FLOOR = 1500;
 const EGGS_WEEK = 12, OAK_WEEK = 2;
 
@@ -250,15 +333,23 @@ const qtyTxt = q => (q === 0.5 ? "½" : q % 1 ? n1(q) : String(q));
 let memoryOnly = false;
 function blank() { return {version: VERSION, start: todayKey(), days: {}, weights: []}; }
 function load() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORE_KEY); } catch (e) { memoryOnly = true; return blank(); }
+  if (!raw) return blank();
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return blank();
     const d = JSON.parse(raw);
-    if (!d || d.version !== VERSION || typeof d.days !== "object") return blank();
-    d.weights = Array.isArray(d.weights) ? d.weights : [];
-    return d;
-  } catch (e) { memoryOnly = true; return blank(); }
+    if (d && d.version === VERSION && d.days && typeof d.days === "object") {
+      d.weights = Array.isArray(d.weights) ? d.weights : [];
+      if (d.settings !== undefined && (!d.settings || typeof d.settings !== "object" || Array.isArray(d.settings))) d.settings = {};
+      return d;
+    }
+  } catch (e) {}
+  // não reconheceu o que estava salvo: guarda uma cópia intacta antes de começar do zero (nunca some)
+  try { localStorage.setItem(`${STORE_KEY}.recuperar-${keyOf(new Date())}`, raw); } catch (e) {}
+  return blank();
 }
+const cfg = () => (data.settings && typeof data.settings === "object" ? data.settings : {});
+function setCfg(patch) { data.settings = Object.assign({}, cfg(), patch); }
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); memoryOnly = false; }
   catch (e) { memoryOnly = true; }
@@ -268,7 +359,8 @@ save();
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 
 /* ---------- estado da tela ---------- */
-const ui = {view: "hoje", day: todayKey(), meal: null, cat: "comuns", modal: null, toast: null, bannerOff: false};
+const ui = {view: "hoje", day: todayKey(), meal: null, cat: "comuns", q: "", modal: null, onb: null, toast: null, bannerOff: false};
+let lastToday = todayKey();
 let undoSnap = null, toastTimer = null, lastWhere = "";
 
 function dayObj(k, create) {
@@ -283,13 +375,22 @@ function totalsOf(list) {
   for (const it of list) { const f = FOOD[it.id]; if (!f) continue; k += f.k * it.q; p += f.p * it.q; }
   return {k, p};
 }
+/* Oakberry: o copo padrão é o tamanho escolhido + whey 28 g + morango (ou banana) */
+function oakCupOf(list) { const it = list.find(i => OAK_CUPS.includes(i.id)); return it ? it.id : null; }
+function oakPadrao(k) {
+  const list = items(k, "lanche"), cup = oakCupOf(list) || "oak500";
+  const ids = [cup, "oakwhey", list.some(i => i.id === "oakbanana") ? "oakbanana" : "oakmorango"];
+  return {cup, k: ids.reduce((a, id) => a + FOOD[id].k, 0), p: ids.reduce((a, id) => a + FOOD[id].p, 0)};
+}
+const oakSemPao = k => dayObj(k).type === "oak" && oakPadrao(k).k > OAK_SEM_PAO;
 function baseTarget(k, m) {
   const d = dayObj(k), b = MEAL[m];
   let t = {kMin: b.kMin, kMax: b.kMax, pMin: b.pMin, adj: 0, adjFrom: null, pBoost: false};
   if (d.type === "oak") {
-    if (m === "lanche") t = {...t, kMin: 520, kMax: 680, pMin: 15};
+    const pd = oakPadrao(k);
+    if (m === "lanche") t = {...t, kMin: pd.k - 120, kMax: pd.k, pMin: 15};
     if (m === "doce") t = {...t, kMin: 0, kMax: 0, pMin: 0};
-    if (m === "jantar") t = {...t, kMin: 280, kMax: 360, pMin: 25};
+    if (m === "jantar" && pd.k > OAK_SEM_PAO) t = {...t, kMin: 280, kMax: 360, pMin: 25};
   }
   return t;
 }
@@ -331,7 +432,7 @@ function status(k, m, T) {
   if (!list.length) return {s: "vazio", txt: "Ainda não lançou"};
   const tot = totalsOf(list);
   if (m === "doce") return tot.k <= t.kMax + 5 ? {s: "ok", txt: "ok"} : {s: "passou", txt: `passou ${n0(tot.k - t.kMax)} kcal`};
-  if (d.type === "oak" && m === "lanche" && list.some(i => i.id === "oak500") && tot.p < t.pMin) return {s: "falta", txt: "sem proteína: peça whey"};
+  if (d.type === "oak" && m === "lanche" && oakCupOf(list) && !list.some(i => i.id === "oakwhey" || i.id === "oakwhey14") && tot.p < t.pMin) return {s: "falta", txt: "sem proteína: peça whey"};
   if (tot.k > t.kMax + 15) return {s: "passou", txt: `passou ${n0(tot.k - t.kMax)} kcal`};
   if (tot.p < t.pMin - 0.5) return {s: "falta", txt: "falta proteína"};
   if (tot.k < t.kMin - 60) return {s: "falta", txt: "falta um pouco"};
@@ -355,14 +456,46 @@ function eggsInWeek(k, excludeMeal) {
   return n;
 }
 function oakInWeek(k) { return weekDays(k).filter(dk => data.days[dk] && data.days[dk].type === "oak").length; }
-function sucoToday(k) { let n = 0; for (const list of Object.values(dayObj(k).meals)) for (const it of list) if (it.id === "suco") n += it.q; return n; }
+function sucoToday(k) { let n = 0; for (const list of Object.values(dayObj(k).meals)) for (const it of list) if (FOOD[it.id] && FOOD[it.id].suco) n += it.q; return n; }
+
+/* Mais usados: frequência nesta refeição (sem contar o dia aberto), pref como desempate */
+function maisUsados(k, m) {
+  const pref = MEAL[m].pref, c = {};
+  for (const [dk, d] of Object.entries(data.days)) {
+    if (dk === k || !d || !d.meals) continue;
+    for (const it of d.meals[m] || []) if (FOOD[it.id]) c[it.id] = (c[it.id] || 0) + 1;
+  }
+  const pos = id => { const i = pref.indexOf(id); return i < 0 ? 1e3 : i; };
+  return pref.concat(Object.keys(c).filter(id => !pref.includes(id)))
+    .filter(id => FOOD[id] && FOOD[id].g !== "fora" && FOOD[id].g !== "oak")
+    .sort((a, b) => ((c[b] || 0) - (c[a] || 0)) || (pos(a) - pos(b))).map(id => FOOD[id]);
+}
+/* busca: ignora acento e maiúscula ("pao" acha "Pão francês") */
+const norm = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function searchFoods(q) {
+  const ws = norm(q).split(/\s+/).filter(Boolean);
+  return CATALOG.filter(f => f.g !== "oak" && ws.every(w => norm(f.nome).includes(w)));
+}
+/* repetir refeição: itens daquela refeição em outro dia (açaí só entra no lanche de dia de Oakberry) */
+function copyItens(src, k, m) {
+  const oakOk = dayObj(k).type === "oak" && m === "lanche";
+  return items(src, m).filter(i => oakOk || FOOD[i.id].g !== "oak").map(i => [i.id, i.q]);
+}
+/* lembrete de cópia de segurança */
+const hasRecords = d => !!d && (Object.values(d.meals || {}).some(l => Array.isArray(l) && l.length) || !!(d.treino || d.cam1 || d.cam2));
+function backupDue(k) {
+  const rec = Object.keys(data.days).filter(dk => hasRecords(data.days[dk])).sort();
+  if (rec.length < 3) return false;
+  return diffDays(cfg().lastBackup || rec[0], k) >= 7;
+}
 
 /* ---------- motor de sugestões ---------- */
 function suggestions(k, m) {
   const list = items(k, m), d = dayObj(k), T = targets(k), t = T[m], tot = totalsOf(list);
+  const semPao = m === "jantar" && oakSemPao(k);
   if (d.type === "oak" && m === "lanche") {
-    if (!list.some(i => i.id === "oak500")) return {msg: "Hoje o lanche é o Oakberry. Toque para lançar o do plano.", opts: [{itens: OAK_PRESET.itens, why: "açaí 500 ml + whey + morango: ~640 kcal e 20 g de proteína"}]};
-    if (!list.some(i => i.id === "oakwhey")) return {msg: "O açaí sozinho não tem proteína.", opts: [{itens: [["oakwhey", 1]], why: "whey no açaí: +20 g de proteína"}]};
+    if (!oakCupOf(list)) return {msg: "Hoje o lanche é o Oakberry. Toque para lançar o do plano.", opts: [{itens: OAK_PRESET.itens, why: "açaí 500 ml + whey + morango: ~640 kcal e 20 g de proteína"}]};
+    if (!list.some(i => i.id === "oakwhey" || i.id === "oakwhey14")) return {msg: "O açaí sozinho não tem proteína.", opts: [{itens: [["oakwhey", 1]], why: "whey no açaí: +20 g de proteína"}]};
     return {msg: null, opts: []};
   }
   if (m === "doce") {
@@ -376,8 +509,8 @@ function suggestions(k, m) {
     if (m === "almoco") combos = [["frango", "frango grelhado"], ["hamb", "hambúrguer caseiro"], ["carne", "carne moída ao molho"]].map(([id]) => base[0].itens.concat([[id, 1]]));
     else combos = base.slice(0, 3).map(p => p.itens);
     const tt = it => totalsOf(it.map(([id, q]) => ({id, q})));
-    combos = combos.map(it => (tt(it).k > t.kMax + 15 ? it.filter(([id]) => !FOOD[id].pao) : it));
-    return {msg: t.adj > 0 || (d.type === "oak" && m === "jantar") ? "Hoje a meta está menor. Estas opções já cabem nela." : "Comece por um prato pronto ou monte com os cards abaixo.",
+    combos = combos.map(it => (semPao || tt(it).k > t.kMax + 15 ? it.filter(([id]) => !FOOD[id].pao) : it));
+    return {msg: t.adj > 0 || semPao ? "Hoje a meta está menor. Estas opções já cabem nela." : "Comece por um prato pronto ou monte com os cards abaixo.",
       opts: combos.map(it => { const x = tt(it); return {itens: it, why: `~${n0(x.k)} kcal e ${n0(x.p)} g de proteína`}; })};
   }
   const pNeed = t.pMin - tot.p, kNeed = t.kMin - tot.k, room = t.kMax - tot.k;
@@ -385,9 +518,10 @@ function suggestions(k, m) {
   if (pNeed <= 0.5 && kNeed <= 60) return {msg: null, opts: []};
   const weekEggs = eggsInWeek(k, m) + list.filter(i => i.id === "ovo").reduce((a, i) => a + i.q, 0);
   const cand = MEAL[m].pref.filter(id => {
-    const f = FOOD[id]; if (!f || f.g === "doce" || f.g === "oak" || f.g === "extra") return false;
+    const f = FOOD[id]; if (!f || f.g === "doce" || f.g === "oak" || f.g === "extra" || f.g === "fora") return false;
     if (id === "ovo" && weekEggs >= EGGS_WEEK) return false;
-    if (id === "suco") return false;
+    if (f.suco || f.k === 0) return false;
+    if (semPao && f.pao) return false;
     if (id === "whey" && list.some(i => i.id === "whey")) return false;
     if (id === "macarrao" && list.some(i => i.id === "arroz")) return false;
     if (id === "arroz" && list.some(i => i.id === "macarrao")) return false;
@@ -412,7 +546,7 @@ function suggestions(k, m) {
   };
   for (const pr of MEAL[m].presets) {
     if (!pr.itens.some(([id]) => list.some(i => i.id === id))) continue;
-    const rest = pr.itens.map(([id, q]) => { const inP = list.find(i => i.id === id); return [id, Math.round((q - (inP ? inP.q : 0)) * 10) / 10]; }).filter(([, q]) => q > 0);
+    const rest = pr.itens.map(([id, q]) => { const inP = list.find(i => i.id === id); return [id, Math.round((q - (inP ? inP.q : 0)) * 10) / 10]; }).filter(([id, q]) => q > 0 && !(semPao && FOOD[id].pao));
     if (rest.length && rest.length <= 3) push(rest, 1.4);
   }
   for (const id of cand) {
@@ -473,7 +607,8 @@ function training(k) {
 function snapshot(k) { undoSnap = {k, day: JSON.parse(JSON.stringify(dayObj(k)))}; }
 function toast(msg, undo) {
   ui.toast = {msg, undo}; clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { ui.toast = null; render(); }, 5000);
+  // some sozinho sem redesenhar a tela: não apaga o que estiver sendo digitado
+  toastTimer = setTimeout(() => { ui.toast = null; const el = document.querySelector(".toast"); if (el) el.remove(); }, 5000);
 }
 function addItems(k, m, itens, label) {
   snapshot(k);
@@ -487,7 +622,12 @@ function addItems(k, m, itens, label) {
     if (it) it.q = Math.round((it.q + q) * 10) / 10; else list.push({id, q});
   }
   save();
-  toast(`Adicionado: ${label || itensTxt(itens)}` + (warnings.length ? ` · ${warnings[0]}` : ""), true);
+  let msg = `Adicionado: ${label || itensTxt(itens)}`;
+  if (itens.some(([id]) => FOOD[id].g === "fora")) {
+    const T = targets(k);
+    msg = MEALS.some(x => T[x.id].adj > 0 && !items(k, x.id).length) ? "Registrado. O app ajustou o resto do dia." : "Registrado.";
+  }
+  toast(msg + (warnings.length ? ` · ${warnings[0]}` : ""), true);
 }
 function changeQty(k, m, id, dir) {
   snapshot(k);
@@ -517,10 +657,38 @@ function setOak(k, on, force) {
   }
   snapshot(k);
   d.type = on ? "oak" : "normal";
-  if (on && !(d.meals.lanche || []).some(i => i.id === "oak500")) d.meals.lanche = OAK_PRESET.itens.map(([id, q]) => ({id, q}));
+  if (on && !oakCupOf(d.meals.lanche || [])) {
+    // soma o copo do plano ao que já estiver no lanche (nada lançado some)
+    const lanche = d.meals.lanche = d.meals.lanche || [];
+    for (const [id, q] of OAK_PRESET.itens) if (!lanche.some(i => i.id === id)) lanche.push({id, q});
+  }
   if (!on && d.meals.lanche) d.meals.lanche = d.meals.lanche.filter(i => FOOD[i.id].g !== "oak");
   save();
-  toast(on ? "Dia de Oakberry: saem o lanche e o docinho, e o jantar fica sem pão." : "Voltou para dia normal.", true);
+  toast(on ? oakTrocasTxt(k, "Dia de Oakberry") : "Voltou para dia normal.", true);
+}
+function oakTrocasTxt(k, pre) {
+  return oakPadrao(k).k > OAK_SEM_PAO ? `${pre}: saem o lanche e o docinho, e o jantar fica sem pão.` : `${pre}: saem o lanche e o docinho. O jantar fica normal.`;
+}
+function setOakSize(k, cup, force) {
+  if (cup === "oak720" && !force) {
+    ui.modal = {title: "Açaí de 720 ml",
+      body: "<p>O de 720 ml passa da meta do dia mesmo com as trocas. Prefira o de 500 ml.</p>",
+      actions: [{label: "Escolher o de 500 ml", a: "oak-size-500", primary: true}, {label: "Lançar o de 720 ml mesmo assim", a: "oak-size-720"}]};
+    return;
+  }
+  snapshot(k);
+  const d = dayObj(k, true), rest = (d.meals.lanche || []).filter(i => !OAK_CUPS.includes(i.id));
+  d.meals.lanche = [{id: cup, q: 1}].concat(rest);
+  save();
+  toast(oakTrocasTxt(k, `Açaí de ${OAK_SIZE[cup].ml} ml`), true);
+}
+function toggleOakTop(k, id) {
+  const d = dayObj(k, true), list = d.meals.lanche || [];
+  if (!list.some(i => i.id === id)) { addItems(k, "lanche", [[id, 1]]); return; }
+  snapshot(k);
+  d.meals.lanche = list.filter(i => i.id !== id);
+  save();
+  toast(`Tirado: ${FOOD[id].nome}`, true);
 }
 
 /* ---------- desenho das telas ---------- */
@@ -538,7 +706,7 @@ function viewHoje() {
   const isToday = k === todayKey();
   const lastW = data.weights.slice().sort((a, b) => a.date < b.date ? 1 : -1)[0];
   const needWeigh = isToday && (!lastW || diffDays(lastW.date, k) >= 7);
-  const oakN = oakInWeek(k);
+  const oakN = oakInWeek(k), semPao = oakSemPao(k), cupH = d.type === "oak" ? oakCupOf(items(k, "lanche")) : null;
   const planDay = tr.idx >= 0 && tr.idx < 15 ? `Dia ${tr.idx + 1} de 15` : tr.idx >= 15 ? `Semana ${Math.floor(tr.idx / 7) + 1} do plano` : "";
   let h = "";
   h += `<div class="daynav">
@@ -549,6 +717,7 @@ function viewHoje() {
   if (memoryOnly) h += `<div class="banner over">Os dados não estão sendo salvos neste modo. Abra pelo ícone na tela de início.</div>`;
   else if (isIOS() && !isStandalone() && !ui.bannerOff) h += `<div class="banner info"><b>Instale na tela de início</b> para não perder seus registros: toque em Compartilhar e depois em "Adicionar à Tela de Início". Depois, abra sempre pelo ícone. <button class="small" style="font-weight:700;color:var(--accent);margin-top:6px" data-a="banner-off">Entendi</button></div>`;
   if (needWeigh) h += `<button class="banner warn" style="width:100%;text-align:left" data-a="go" data-v="peso"><b>Hora de pesar ⚖️</b><br>Em jejum, depois do banheiro. Toque para lançar.</button>`;
+  if (isToday && backupDue(k)) h += `<div class="banner warn">💾 Faz uma semana sem cópia dos seus dados. Salvar agora?<button class="btn block" style="margin-top:10px" data-a="export">Salvar cópia dos dados</button></div>`;
   h += `<div class="card"><h2>${isToday ? "Treino de hoje" : "Treino do dia"}</h2>
     <div style="font-size:21px;font-weight:700">${esc(tr.txt)}</div><div class="note">${esc(tr.det)}</div>
     ${!tr.rest ? `<button class="check ${d.treino ? "on" : ""}" data-a="tog" data-f="treino"><span class="box">${d.treino ? "✓" : ""}</span><span>Treino feito</span></button>` : ""}
@@ -561,13 +730,14 @@ function viewHoje() {
     <div class="barlabel"><span>Calorias</span><span><b>${n0(tot.k)}</b> de 1.700–1.800</span></div>${bar(tot.k, 0, DAY_KMAX, kCls)}
     <div class="barlabel"><span>Proteína</span><span><b>${n0(tot.p)} g</b> de ${DAY_PMIN}–${DAY_PMAX} g</span></div>${bar(tot.p, 0, DAY_PMIN, pCls)}
   </div>`;
-  h += `<div class="card"><button class="oakbtn" data-a="oak" data-on="${d.type === "oak" ? 0 : 1}"><span class="emo">🍇</span><span class="grow"><b>${d.type === "oak" ? "Hoje é dia de Oakberry" : "Hoje tem Oakberry?"}</b><br><span class="note">${d.type === "oak" ? "Toque para desfazer. Lanche vira açaí, sem docinho, jantar sem pão." : "Toque se for tomar. O app faz as trocas sozinho."}</span></span><span class="chip ${oakN >= OAK_WEEK ? "passou" : "ok"}">${oakN} de ${OAK_WEEK} na semana</span></button></div>`;
+  if (isToday && tot.k > DAY_KMAX) h += `<div class="banner info">Amanhã segue normal. Não pule refeição para compensar.</div>`;
+  h += `<div class="card"><button class="oakbtn" data-a="oak" data-on="${d.type === "oak" ? 0 : 1}"><span class="emo">🍇</span><span class="grow"><b>${d.type === "oak" ? "Hoje é dia de Oakberry" : "Hoje tem Oakberry?"}</b><br><span class="note">${d.type === "oak" ? `Toque para desfazer. Lanche vira açaí, sem docinho${semPao ? ", jantar sem pão" : ""}.` : "Toque se for tomar. O app faz as trocas sozinho."}</span></span><span class="chip ${oakN >= OAK_WEEK ? "passou" : "ok"}">${oakN} de ${OAK_WEEK} na semana</span></button></div>`;
   h += `<div class="card" style="padding:4px 0">`;
   MEALS.forEach((m, i) => {
     const st = status(k, m.id, T), t = T[m.id], list = items(k, m.id), mt = totalsOf(list);
     let nome = m.nome, hora = m.hora, extra = "";
-    if (d.type === "oak" && m.id === "lanche") { nome = "Oakberry"; hora = "no lugar do lanche, de preferência depois do treino"; }
-    if (d.type === "oak" && m.id === "jantar") extra = `<div class="note warn">Hoje sem pão.</div>`;
+    if (d.type === "oak" && m.id === "lanche") { nome = cupH ? `Oakberry ${OAK_SIZE[cupH].ml} ml` : "Oakberry"; hora = "no lugar do lanche, de preferência depois do treino"; }
+    if (semPao && m.id === "jantar") extra = `<div class="note warn">Hoje sem pão.</div>`;
     if (t.adj > 0 && !list.length) extra += `<div class="note warn">Meta ajustada: −${n0(t.adj)} kcal porque o ${esc(t.adjFrom.toLowerCase())} passou da meta.${m.id === "jantar" && t.adj >= 100 ? " Dica: jantar sem pão." : ""}</div>`;
     if (t.pBoost && !list.length) extra += `<div class="note warn">Capriche na proteína: o dia está com pouca.</div>`;
     h += `<button class="meal" data-a="open" data-m="${m.id}" style="${i ? "border-top:1px solid var(--line)" : ""}">
@@ -584,7 +754,8 @@ function viewMeal() {
   const k = ui.day, m = ui.meal, meal = MEAL[m], d = dayObj(k), T = targets(k), t = T[m];
   const list = items(k, m), tot = totalsOf(list), st = status(k, m, T), sg = suggestions(k, m);
   const isOakLanche = d.type === "oak" && m === "lanche";
-  const nome = isOakLanche ? "Oakberry" : meal.nome;
+  const cup = isOakLanche ? oakCupOf(list) : null;
+  const nome = isOakLanche ? (cup ? `Oakberry ${OAK_SIZE[cup].ml} ml` : "Oakberry") : meal.nome;
   let h = `<button class="back" data-a="go" data-v="hoje">‹ Hoje</button>`;
   h += `<div class="row between" style="margin:4px 0 2px"><div><div style="font-size:24px;font-weight:800">${isOakLanche ? "🍇" : meal.e} ${esc(nome)}</div><div class="note">${fmtDay(k)}</div></div><span class="chip ${st.s}">${st.s === "ok" ? "✓ " : ""}${esc(st.txt)}</span></div>`;
   if (!(m === "doce" && d.type === "oak")) {
@@ -593,20 +764,31 @@ function viewMeal() {
       ${t.pMin ? `<div class="barlabel"><span>Proteína</span><span><b>${n0(tot.p)} g</b> de pelo menos ${t.pMin} g</span></div>${bar(tot.p, 0, t.pMin, tot.p >= t.pMin - 0.5 ? "" : "low")}` : ""}
       ${t.adj > 0 ? `<div class="note warn">Meta ajustada em −${n0(t.adj)} kcal porque o ${esc(t.adjFrom.toLowerCase())} passou da meta.</div>` : ""}
       ${t.pBoost ? `<div class="note warn">Meta de proteína maior hoje: o dia está com pouca.</div>` : ""}
-      ${d.type === "oak" && m === "jantar" ? `<div class="note warn">Dia de Oakberry: jantar sem pão.</div>` : ""}
+      ${m === "jantar" && oakSemPao(k) ? `<div class="note warn">Dia de Oakberry: jantar sem pão.</div>` : ""}
     </div>`;
   } else {
     h += `<div class="banner info">Hoje o docinho foi trocado pelo açaí. Se comer mesmo assim, lance aqui: o app tira do jantar.</div>`;
   }
-  if (st.s === "passou") h += `<div class="banner over">Passou ${n0(tot.k - t.kMax)} kcal. Tudo bem: o app já tirou isso das próximas refeições.</div>`;
+  if (st.s === "passou") {
+    const ajustou = MEALS.some(x => x.id !== m && T[x.id].adj > 0 && !items(k, x.id).length);
+    h += `<div class="banner over">Passou ${n0(tot.k - t.kMax)} kcal. ${ajustou ? "Tudo bem: o app já tirou isso das próximas refeições." : "Tudo bem, acontece. Amanhã segue normal."}</div>`;
+  }
+  if (isOakLanche) h += oakSteps(k, list);
   h += `<div class="card"><h2>No prato</h2><div class="plate" id="plate">`;
   if (!list.length) h += `<div class="muted small" style="padding:14px 8px;text-align:center">Toque nos cards abaixo para montar o prato.</div>`;
   for (const it of list) {
     const f = FOOD[it.id];
-    h += `<div class="item"><span class="emo">${f.e}</span><div class="grow"><b>${esc(f.nome)}</b><div class="note">${esc(f.porcao)} · ${n0(f.k * it.q)} kcal</div></div>
+    h += `<div class="item"><span class="emo">${f.e}</span><div class="grow"><b>${esc(f.nome)}</b><div class="note">${esc(f.porcao)} · ${f.est ? "~" : ""}${n0(f.k * it.q)} kcal</div></div>
       <div class="qty"><button data-a="q" data-id="${it.id}" data-n="-1" aria-label="Menos">−</button><b>${qtyTxt(it.q)}</b><button data-a="q" data-id="${it.id}" data-n="1" aria-label="Mais">+</button></div></div>`;
   }
   h += `</div></div>`;
+  // repetir refeição: soma ao prato atual e pode ser desfeito
+  const yday = copyItens(addDays(k, -1), k, m);
+  let hasCopy = false;
+  for (let i = 1; i <= 14 && !hasCopy; i++) hasCopy = copyItens(addDays(k, -i), k, m).length > 0;
+  if (yday.length || hasCopy) {
+    h += `<div class="repeat">${yday.length ? `<button class="btn block" data-a="repeat-yday">↻ Repetir ${k === todayKey() ? "de ontem" : "do dia anterior"}</button>` : ""}${hasCopy ? `<button class="btn block" data-a="copy-open">📋 Copiar de outro dia</button>` : ""}</div>`;
+  }
   if (sg.msg || sg.opts.length) {
     h += `<div class="card"><h2>O que falta</h2>${sg.msg ? `<div style="margin-bottom:10px">${esc(sg.msg)}</div>` : ""}<div class="sugs">`;
     sg.opts.forEach((o, i) => {
@@ -616,21 +798,57 @@ function viewMeal() {
   } else if (st.s === "ok") {
     h += `<div class="banner info">✓ Refeição completa. Bom trabalho!</div>`;
   }
-  const presets = isOakLanche ? [OAK_PRESET] : meal.presets;
+  // no dia de Oakberry, os passos 1 e 2 acima substituem o "Montar rápido" do lanche
+  const presets = isOakLanche ? [] : meal.presets;
   if (presets.length) {
     h += `<div class="small muted" style="font-weight:700;margin:14px 0 4px">Montar rápido</div><div class="presets">${presets.map((p, i) => `<button data-a="preset" data-i="${i}">${esc(p.nome)}</button>`).join("")}</div>`;
   }
-  const cats = isOakLanche ? [["oak", "Oakberry"], ["comuns", "Comuns no lanche"]] : [["comuns", "Comuns aqui"], ...Object.entries(GROUPS).filter(([g]) => g !== "oak")];
+  const cats = [["comuns", "Mais usados"], ...Object.entries(GROUPS).filter(([g]) => g !== "oak")];
   if (!cats.some(([c]) => c === ui.cat)) ui.cat = cats[0][0];
-  h += `<div class="cats">${cats.map(([c, l]) => `<button class="${ui.cat === c ? "on" : ""}" data-a="cat" data-c="${c}">${esc(l)}</button>`).join("")}</div>`;
-  const foods = ui.cat === "comuns" ? meal.pref.map(id => FOOD[id]) : CATALOG.filter(f => f.g === ui.cat);
-  h += `<div class="grid">`;
-  for (const f of foods) {
-    const inP = list.find(i => i.id === f.id);
-    h += `<button class="food" draggable="true" data-a="add" data-id="${f.id}"><span class="emo">${f.e}</span><span class="fn">${esc(f.nome)}</span><span class="fp">${esc(f.porcao)}</span>${inP ? `<span class="cnt">${qtyTxt(inP.q)}</span>` : (f.p >= 5 && f.p / Math.max(f.k, 1) > 0.05 ? `<span class="tag">proteína</span>` : "")}</button>`;
-  }
-  h += `</div>`;
+  h += `<div class="search" style="margin:14px 0 6px"><input id="busca" type="search" enterkeyhint="search" autocomplete="off" placeholder="🔎 Buscar alimento" aria-label="Buscar alimento" value="${esc(ui.q)}"></div>`;
+  h += `<div class="cats">${cats.map(([c, l]) => `<button class="${ui.cat === c && !ui.q.trim() ? "on" : ""}" data-a="cat" data-c="${c}">${esc(l)}</button>`).join("")}</div>`;
+  h += `<div class="grid" id="foods">${foodsGrid()}</div>`;
   return h;
+}
+function foodsGrid() {
+  const k = ui.day, m = ui.meal, list = items(k, m), q = ui.q.trim();
+  const foods = q ? searchFoods(q) : ui.cat === "comuns" ? maisUsados(k, m) : CATALOG.filter(f => f.g === ui.cat);
+  if (q && !foods.length) return `<div class="muted" style="grid-column:1/-1;padding:10px 4px">Nada encontrado para “${esc(q)}”.</div>`;
+  return foods.map(f => {
+    const inP = list.find(i => i.id === f.id);
+    const tag = inP ? `<span class="cnt">${qtyTxt(inP.q)}</span>` : (f.g !== "fora" && f.p >= 5 && f.p / Math.max(f.k, 1) > 0.05 ? `<span class="tag">proteína</span>` : "");
+    return `<button class="food" draggable="true" data-a="add" data-id="${f.id}"><span class="emo">${f.e}</span><span class="fn">${esc(f.nome)}</span><span class="fp">${esc(f.porcao)}${f.est ? ` · ~${n0(f.k)} kcal` : ""}</span>${tag}</button>`;
+  }).join("");
+}
+function oakSteps(k, list) {
+  const cup = oakCupOf(list), jantarVazio = !items(k, "jantar").length;
+  let h = `<div class="card"><h2>1. Tamanho</h2><div class="sizes">`;
+  for (const id of OAK_CUPS) {
+    const on = cup === id, copo = FOOD[id].k + FOOD.oakwhey.k + FOOD.oakmorango.k;
+    h += `<button class="size ${on ? "on" : ""}" data-a="oak-size" data-id="${id}" aria-pressed="${on}"><b>${on ? "✓ " : ""}${OAK_SIZE[id].ml} ml</b><span>${OAK_SIZE[id].apelido}${on ? " · escolhido" : ""}</span><span class="muted">${n0(copo)} kcal</span></button>`;
+  }
+  h += `</div><div class="note16">Valores com whey 28 g e morango. ${oakPadrao(k).k > OAK_SEM_PAO ? "Neste tamanho saem o lanche, o docinho e o pão do jantar." : "Neste tamanho saem o lanche e o docinho; o jantar fica normal."}</div></div>`;
+  h += `<div class="card"><h2>2. Acompanhamentos</h2>`;
+  const whey28 = list.some(i => i.id === "oakwhey"), banana = list.some(i => i.id === "oakbanana");
+  for (const id of OAK_TOPS) {
+    const f = FOOD[id], on = list.some(i => i.id === id);
+    let note;
+    if (id === "oakwhey") note = "20 g de proteína · já conta no copo";
+    else if (id === "oakmorango") note = banana ? `+${n0(f.k)} kcal` : "já conta no copo";
+    else if (id === "oakbanana") note = "pode entrar no lugar do morango";
+    else if (id === "oakwhey14" && !whey28) note = "11 g de proteína";
+    else note = `+${n0(f.k)} kcal${jantarVazio ? ", o app tira do jantar" : ""}`;
+    h += `<button class="check ${on ? "on" : ""}" data-a="oak-top" data-id="${id}" aria-pressed="${on}"><span class="box">${on ? "✓" : ""}</span><span class="grow"><b>${f.e} ${esc(f.nome)}</b> <span class="muted">${esc(f.porcao)}</span><div class="note16">${note}</div></span></button>`;
+  }
+  return h + `</div>`;
+}
+function copyModal(k, m) {
+  const rows = [];
+  for (let i = 1; i <= 14; i++) { const dk = addDays(k, -i), it = copyItens(dk, k, m); if (it.length) rows.push([dk, it]); }
+  return {title: `Copiar ${MEAL[m].nome.toLowerCase()} de outro dia`,
+    body: rows.length ? rows.map(([dk, it]) => { const tt = totalsOf(it.map(([id, q]) => ({id, q}))); return `<button class="dayrow" data-a="copy-day" data-d="${dk}"><b>${fmtDay(dk)}</b><span>${esc(itensTxt(it))}</span><span class="muted">${n0(tt.k)} kcal · ${n0(tt.p)} g de proteína</span></button>`; }).join("")
+      : "<p>Nenhum dia com esta refeição nos últimos 14 dias.</p>",
+    actions: [{label: "Fechar", a: "modal-close", primary: true}]};
 }
 
 function weightChart(ws) {
@@ -748,10 +966,31 @@ function helpModal() {
       <p><b>Dor em articulação por mais de 48 horas:</b> avise o personal antes do próximo treino.</p>`,
     actions: [{label: "Ligar 192", a: "call192", danger: true}, {label: "Fechar", a: "modal-close", primary: true}]};
 }
+/* primeira abertura: telas curtas e a data de início */
+function onbSteps() {
+  const s = [
+    {t: "Bem-vindo ao Meu Plano", b: "Toque nos cards do que você comeu. O app soma e diz o que falta."},
+    {t: "As cores", b: "Verde é ok, amarelo é que faltou algo, laranja é que passou. Passou? O app ajusta o resto do dia.", cores: true}
+  ];
+  if (isIOS() && !isStandalone()) s.push({t: "Instale no iPhone", b: "Instale: Compartilhar, depois Adicionar à Tela de Início. Use sempre pelo ícone."});
+  s.push({t: "Quando começa o plano?", date: true});
+  return s;
+}
+function viewOnb() {
+  const steps = onbSteps(), i = Math.min(ui.onb.step, steps.length - 1), s = steps[i], last = i === steps.length - 1;
+  let body = s.b ? `<p class="onb-txt">${esc(s.b)}</p>` : "";
+  if (s.cores) body += `<div class="onb-cores"><span class="chip ok">✓ ok</span><span class="chip falta">falta proteína</span><span class="chip passou">passou 80 kcal</span></div>`;
+  if (s.date) body += `<p class="onb-txt">Escolha o dia 1 do plano. Dá para mudar depois em "Por quê?".</p><div class="field"><label for="onbdate">Data de início do plano</label><input id="onbdate" type="date" value="${data.start}"></div>`;
+  return `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(s.t)}">
+    <div class="onb-step">Passo ${i + 1} de ${steps.length}</div><h3>${esc(s.t)}</h3>${body}
+    <div class="acts">${last ? `<button class="btn primary block" data-a="onb-fim">Começar</button>` : `<button class="btn primary block" data-a="onb-next">Próximo</button>`}</div></div></div>`;
+}
 
-function render() {
+function render(passive) {
   const app = document.getElementById("app");
   const y = window.scrollY;
+  // redesenho que ele não pediu (virada do dia, outra aba): mantém o que ele digitou e ainda não salvou
+  const typed = passive ? [...app.querySelectorAll("input[id]")].filter(i => i.type !== "file" && i.value !== i.defaultValue).map(i => [i.id, i.value]) : [];
   let main = "";
   if (ui.view === "hoje") main = viewHoje();
   else if (ui.view === "refeicao") main = viewMeal();
@@ -769,19 +1008,32 @@ function render() {
       <button class="${tab("porque")}" data-a="go" data-v="porque"><span>💡</span>Por quê?</button>
     </div></nav>
     ${ui.toast ? `<div class="toast" role="status"><span>${esc(ui.toast.msg)}</span>${ui.toast.undo && undoSnap ? `<button data-a="undo">Desfazer</button>` : ""}</div>` : ""}
-    ${viewModal()}`;
+    ${ui.onb ? viewOnb() : viewModal()}`;
+  for (const [id, v] of typed) { const el = document.getElementById(id); if (el) el.value = v; }
   const where = ui.view + "|" + (ui.meal || "") + "|" + ui.day;
   if (where !== lastWhere) window.scrollTo(0, 0); else window.scrollTo(0, y);
   lastWhere = where;
   const imp = document.getElementById("imp");
   if (imp) imp.addEventListener("change", onImport);
+  const busca = document.getElementById("busca");
+  if (busca) busca.addEventListener("input", onBusca);
+  // a aba escolhida fica à vista na fileira de abas
+  const catOn = document.querySelector(".cats button.on");
+  if (catOn) catOn.parentElement.scrollLeft = Math.max(0, catOn.offsetLeft - catOn.parentElement.offsetLeft - 16);
   bindDrag();
+}
+/* busca: redesenha só os cards, para o teclado não fechar */
+function onBusca(e) {
+  ui.q = e.target.value;
+  const g = document.getElementById("foods"); if (g) { g.innerHTML = foodsGrid(); bindFoodDrag(); }
+  document.querySelectorAll(".cats button").forEach(b => b.classList.toggle("on", !ui.q.trim() && b.dataset.c === ui.cat));
 }
 
 /* ---------- arrastar (computador) ---------- */
+function bindFoodDrag() { document.querySelectorAll(".food[draggable]").forEach(el => el.addEventListener("dragstart", e => e.dataTransfer.setData("text/plain", el.dataset.id))); }
 function bindDrag() {
   const plate = document.getElementById("plate"); if (!plate) return;
-  document.querySelectorAll(".food[draggable]").forEach(el => el.addEventListener("dragstart", e => e.dataTransfer.setData("text/plain", el.dataset.id)));
+  bindFoodDrag();
   plate.addEventListener("dragover", e => { e.preventDefault(); plate.classList.add("drag"); });
   plate.addEventListener("dragleave", () => plate.classList.remove("drag"));
   plate.addEventListener("drop", e => {
@@ -797,9 +1049,18 @@ document.addEventListener("click", e => {
   const a = el.dataset.a, k = ui.day;
   if (a === "modal-bg" && e.target !== el) return;
   switch (a) {
-    case "go": ui.view = el.dataset.v; ui.meal = null; break;
+    case "go": ui.view = el.dataset.v; ui.meal = null; ui.q = ""; break;
     case "day": { const n = Number(el.dataset.n), nk = addDays(k, n); if (nk <= todayKey()) ui.day = nk; break; }
-    case "open": ui.meal = el.dataset.m; ui.view = "refeicao"; ui.cat = (dayObj(k).type === "oak" && ui.meal === "lanche") ? "oak" : "comuns"; break;
+    case "open": ui.meal = el.dataset.m; ui.view = "refeicao"; ui.cat = "comuns"; ui.q = ""; break;
+    case "oak-size": setOakSize(k, el.dataset.id); ui.keepScroll = true; break;
+    case "oak-size-500": ui.modal = null; setOakSize(k, "oak500"); ui.keepScroll = true; break;
+    case "oak-size-720": ui.modal = null; setOakSize(k, "oak720", true); ui.keepScroll = true; break;
+    case "oak-top": toggleOakTop(k, el.dataset.id); ui.keepScroll = true; break;
+    case "repeat-yday": { const it = copyItens(addDays(k, -1), k, ui.meal); if (it.length) addItems(k, ui.meal, it, `${MEAL[ui.meal].nome.toLowerCase()} ${k === todayKey() ? "de ontem" : "do dia anterior"}`); ui.keepScroll = true; break; }
+    case "copy-open": ui.modal = copyModal(k, ui.meal); ui.keepScroll = true; break;
+    case "copy-day": { const src = el.dataset.d, it = copyItens(src, k, ui.meal); ui.modal = null; if (it.length) addItems(k, ui.meal, it, `${MEAL[ui.meal].nome.toLowerCase()} de ${fmtShort(src)}`); ui.keepScroll = true; break; }
+    case "onb-next": ui.onb.step++; break;
+    case "onb-fim": { const v = (document.getElementById("onbdate") || {}).value; if (v) data.start = v; setCfg({onboarded: true}); save(); ui.onb = null; break; }
     case "tog": { snapshot(k); const d = dayObj(k, true); d[el.dataset.f] = !d[el.dataset.f]; save(); ui.keepScroll = true; break; }
     case "oak": setOak(k, el.dataset.on === "1"); ui.keepScroll = true; break;
     case "oak-force": ui.modal = null; setOak(k, true, true); ui.keepScroll = true; break;
@@ -807,7 +1068,7 @@ document.addEventListener("click", e => {
     case "q": changeQty(k, ui.meal, el.dataset.id, Number(el.dataset.n)); ui.keepScroll = true; break;
     case "sug": { const sg = suggestions(k, ui.meal), o = sg.opts[Number(el.dataset.i)]; if (o) addItems(k, ui.meal, o.itens); ui.keepScroll = true; break; }
     case "preset": { const d = dayObj(k); const ps = (d.type === "oak" && ui.meal === "lanche") ? [OAK_PRESET] : MEAL[ui.meal].presets; const p = ps[Number(el.dataset.i)]; if (p) addItems(k, ui.meal, p.itens, p.nome); ui.keepScroll = true; break; }
-    case "cat": ui.cat = el.dataset.c; ui.keepScroll = true; break;
+    case "cat": ui.cat = el.dataset.c; ui.q = ""; ui.keepScroll = true; break;
     case "undo": if (undoSnap) { data.days[undoSnap.k] = undoSnap.day; undoSnap = null; save(); ui.toast = null; } ui.keepScroll = true; break;
     case "help": helpModal(); ui.keepScroll = true; break;
     case "call192": location.href = "tel:192"; break;
@@ -841,15 +1102,17 @@ function exportData() {
   try {
     const file = new File([blob], name, {type: "application/json"});
     if (navigator.canShare && navigator.canShare({files: [file]})) {
-      navigator.share({files: [file], title: "Cópia do Meu Plano"}).catch(() => {});
+      navigator.share({files: [file], title: "Cópia do Meu Plano"}).then(() => { markBackup(); toast("Cópia salva."); render(); }).catch(() => {});
       return;
     }
   } catch (e) {}
   const url = URL.createObjectURL(blob), a = document.createElement("a");
   a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
+  markBackup();
   toast("Cópia salva."); render();
 }
+function markBackup() { setCfg({lastBackup: todayKey()}); save(); }
 function onImport(e) {
   const f = e.target.files && e.target.files[0]; if (!f) return;
   const r = new FileReader();
@@ -876,6 +1139,23 @@ document.addEventListener("click", e => {
 if ("serviceWorker" in navigator && location.protocol === "https:") {
   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 }
+/* virada do dia: se o app ficou aberto (ou volta do fundo) depois da meia-noite, "Hoje" passa para o dia novo */
+function checkNewDay() {
+  const t = todayKey();
+  if (t === lastToday) return;
+  const eraHoje = ui.day === lastToday;
+  lastToday = t;
+  if (eraHoje) { ui.day = t; ui.modal = null; if (ui.view === "refeicao") { ui.view = "hoje"; ui.meal = null; ui.q = ""; } }
+  render(true);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNewDay(); });
+window.addEventListener("focus", checkNewDay);
+window.addEventListener("pageshow", checkNewDay);
+setInterval(checkNewDay, 60000);
+/* outra aba ou janela do app salvou: recarrega para uma não apagar o que a outra gravou */
+window.addEventListener("storage", e => { if (e.key === STORE_KEY) { data = load(); render(true); } });
+
+if (!cfg().onboarded && !Object.keys(data.days).length && !data.weights.length) ui.onb = {step: 0};
 window.MeuPlano = {data: () => data, targets, suggestions, status, dayTotals, totalsOf, FOOD, MEALS};
 render();
 </script>
